@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #f3f4f6;
+    --border: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+
+  body {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .back-link:hover {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .form-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 1.5rem;
+    color: white;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .form-body {
+    padding: 2rem;
+  }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--secondary);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .form-grid.full {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+  }
+
+  .form-control,
+  .form-select {
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: white;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-group-text {
+    padding: 0.75rem 0.875rem;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .input-group .form-control {
+    border-radius: 0 0.5rem 0.5rem 0;
+    border-left: none;
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  .form-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.375rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+
+  .btn-secondary {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: #e5e7eb;
+    border-color: var(--text-secondary);
+  }
+
+  .existing-attachments {
+    background: var(--secondary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .existing-attachments ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .existing-attachments li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .existing-attachments li:last-child {
+    border-bottom: none;
+  }
+
+  .existing-attachments a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .existing-attachments a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-body {
+      padding: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="back-link" onclick="window.history.back(); return false;">
+  ← Back to list
+</div>
+
+<div class="page-header">
+  <h1 class="page-title">{{ 'Edit Bid' if edit_mode else 'Add New Bid' }}</h1>
+  <p class="page-subtitle">Manage bid details and track procurement opportunities</p>
+</div>
+
+<div class="form-card">
+  <div class="form-header">
+    <h2>{{ 'Update Bid Information' if edit_mode else 'Create New Bid' }}</h2>
+  </div>
+
+  <div class="form-body">
+    <form method="post" action="{{ form_action }}" enctype="multipart/form-data">
+
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <div class="form-section-title">Basic Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Date Monitored</label>
+            <input type="date" name="date_monitored" class="form-control" value="{{ form_data.get('date_monitored') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reference / Notice Reference Number *</label>
+            <input type="text" name="reference_number" class="form-control" value="{{ form_data.get('reference_number') or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">System Type</label>
+            <select name="system_type" class="form-select">
+              <option value="Philgeps" {% if form_data.get('system_type') == 'Philgeps' %}selected{% endif %}>Philgeps</option>
+              <option value="Mgeps" {% if form_data.get('system_type') == 'Mgeps' %}selected{% endif %}>Mgeps</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Procuring Entity</label>
+            <input type="text" name="procuring_entity" class="form-control" value="{{ form_data.get('procuring_entity') or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Details -->
+      <div class="form-section">
+        <div class="form-section-title">Project Details</div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label class="form-label">Project Title</label>
+            <input type="text" name="project_title" class="form-control" value="{{ form_data.get('project_title') or '' }}">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <input list="category-list" name="category" class="form-control" value="{{ form_data.get('category') or '' }}" placeholder="Enter or select">
+            <datalist id="category-list">
+              {% for value in categories %}
+                <option value="{{ value }}"></option>
+              {% endfor %}
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Region</label>
+            <select name="region" class="form-select">
+              <option value="">Select region</option>
+              {% for value in regions %}
+                <option value="{{ value }}" {% if form_data.get('region') == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Province</label>
+            <input type="text" name="province" class="form-control" value="{{ form_data.get('province') or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Mgeps Details -->
+      <div class="form-section">
+        <div class="form-section-title">Mgeps Details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Control Number</label>
+            <input type="text" name="control_number" class="form-control" value="{{ form_data.get('control_number') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Procurement Mode</label>
+            <select name="procurement_mode" class="form-select">
+              <option value="">Select mode</option>
+              <option value="Small Value Procurement" {% if form_data.get('procurement_mode') == 'Small Value Procurement' %}selected{% endif %}>Small Value Procurement</option>
+              <option value="Public Bidding" {% if form_data.get('procurement_mode') == 'Public Bidding' %}selected{% endif %}>Public Bidding</option>
+              <option value="Negotiated Procurement" {% if form_data.get('procurement_mode') == 'Negotiated Procurement' %}selected{% endif %}>Negotiated Procurement</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivery / Project Location</label>
+            <input type="text" name="delivery_location" class="form-control" value="{{ form_data.get('delivery_location') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Person</label>
+            <input type="text" name="contact_person" class="form-control" value="{{ form_data.get('contact_person') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date Created</label>
+            <input type="datetime-local" name="date_created" class="form-control" value="{{ form_data.get('date_created') or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Information -->
+      <div class="form-section">
+        <div class="form-section-title">Financial Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ABC Value (₱)</label>
+            <div class="input-group">
+              <span class="input-group-text">₱</span>
+              <input type="number" step="0.01" min="0" name="abc_value" class="form-control" value="{{ form_data.get('abc_value') or '' }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bid Amount (₱)</label>
+            <div class="input-group">
+              <span class="input-group-text">₱</span>
+              <input type="number" step="0.01" min="0" name="bid_amount" class="form-control" value="{{ form_data.get('bid_amount') or '' }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ABC Flag</label>
+            <input type="text" name="abc_flag" class="form-control" value="{{ form_data.get('abc_flag') or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="form-section">
+        <div class="form-section-title">Timeline & Deadlines</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Closing Date</label>
+            <input type="date" name="closing_date" class="form-control" value="{{ form_data.get('closing_date') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Closing Time</label>
+            <input type="time" name="closing_time" class="form-control" value="{{ form_data.get('closing_time') or '' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Days Remaining</label>
+            <input type="number" name="days_remaining" class="form-control" value="{{ form_data.get('days_remaining') or '' }}" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date Submitted</label>
+            <input type="date" name="date_submitted" class="form-control" value="{{ form_data.get('date_submitted') or '' }}" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status & Priority -->
+      <div class="form-section">
+        <div class="form-section-title">Status & Priority</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="">Select status</option>
+              {% for value in statuses %}
+                <option value="{{ value }}" {% if form_data.get('status') == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority Level</label>
+            <select name="priority_level" class="form-select">
+              <option value="">Select priority</option>
+              {% for value in priorities %}
+                <option value="{{ value }}" {% if form_data.get('priority_level') == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Canvassing Status</label>
+            <select name="canvassing_status" class="form-select">
+              <option value="">Select canvassing status</option>
+              {% for value in ['Not Started', 'In Progress', 'Completed', 'On Hold'] %}
+                <option value="{{ value }}" {% if form_data.get('canvassing_status') == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results & Scoring -->
+      <div class="form-section">
+        <div class="form-section-title">Results & Scoring</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Result</label>
+            <select name="result" class="form-select">
+              <option value="">Select result</option>
+              {% for value in ['Won', 'Lost', 'Cancelled', 'Pending'] %}
+                <option value="{{ value }}" {% if form_data.get('result') == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opportunity Score</label>
+            <input type="number" name="opportunity_score" class="form-control" value="{{ form_data.get('opportunity_score') or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Notes -->
+      <div class="form-section">
+        <div class="form-section-title">Additional Information</div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label class="form-label">Remarks</label>
+            <textarea name="remarks" class="form-control">{{ form_data.get('remarks') or '' }}</textarea>
+          </div>
+        </div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label class="form-label">Recommendation</label>
+            <textarea name="recommendation" class="form-control">{{ form_data.get('recommendation') or '' }}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attachments -->
+      <div class="form-section">
+        <div class="form-section-title">Attachments</div>
+        <div class="form-grid full">
+          <div class="form-group">
+            <label class="form-label">Upload Files</label>
+            <input type="file" name="attachments" class="form-control" multiple>
+            <div class="form-text">Upload PDF, DOCX, XLSX, images, or text files.</div>
+          </div>
+        </div>
+
+        {% if edit_mode and bid and bid.attachments %}
+        <div class="existing-attachments">
+          <label class="form-label">Existing Attachments</label>
+          <ul>
+            {% for filename in bid.attachments.split(';') %}
+              <li><a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">📎 {{ filename }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+        <button type="submit" class="btn btn-primary">{{ 'Update Bid' if edit_mode else 'Create Bid' }}</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  function updateDaysRemaining() {
+    const closingDateInput = document.querySelector('input[name="closing_date"]');
+    const daysRemainingInput = document.querySelector('input[name="days_remaining"]');
+    if (!closingDateInput || !daysRemainingInput) return;
+
+    const value = closingDateInput.value;
+    if (!value) {
+      daysRemainingInput.value = '';
+      return;
+    }
+
+    const closingDate = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffMs = closingDate - today;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    daysRemainingInput.value = Number.isNaN(diffDays) ? '' : diffDays;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const closingDateInput = document.querySelector('input[name="closing_date"]');
+    if (closingDateInput) {
+      closingDateInput.addEventListener('change', updateDaysRemaining);
+      updateDaysRemaining();
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* Header Section */
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .report-header-left {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex: 1;
+  }
+
+  .report-header-left img {
+    height: 56px;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .report-header-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .report-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 4px;
+  }
+
+  .report-sub {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  .report-header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-outline-secondary {
+    background: white;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-outline-secondary:hover {
+    background: #f0f4f8;
+    border-color: #cbd5e0;
+  }
+
+  .btn-outline-primary {
+    background: white;
+    color: #667eea;
+    border: 1px solid #667eea;
+  }
+
+  .btn-outline-primary:hover {
+    background: #f0f4f8;
+  }
+
+  /* Filter Section */
+  .filter-form {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 32px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: flex-end;
+  }
+
+  .row > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .row > div[style*="align-self:end"] {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .row input,
+  .row select {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .row input:focus,
+  .row select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .g-2 {
+    margin-bottom: 0;
+  }
+
+  /* Cards */
+  .summary-card {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .summary-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .summary-main {
+    flex: 1;
+    padding: 24px;
+    background: white;
+  }
+
+  .summary-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  .summary-row:last-child {
+    border-bottom: 0;
+  }
+
+  .label {
+    width: 160px;
+    font-weight: 700;
+    color: #718096;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    color: #1a202c;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .value.currency {
+    color: #48bb78;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .summary-side {
+    width: 200px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+  }
+
+  .status-box {
+    text-align: center;
+    padding: 16px 20px;
+    font-weight: 700;
+    color: white;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .status-box.open {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .status-box.pending {
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+  }
+
+  .status-box.awarded {
+    background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+  }
+
+  .status-box.closed {
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  }
+
+  /* Empty State */
+  .empty-state {
+    background: white;
+    padding: 60px 24px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    color: #718096;
+    font-size: 16px;
+  }
+
+  /* Print Styles */
+  @media print {
+    .no-print {
+      display: none;
+    }
+
+    .container {
+      padding: 0;
+    }
+
+    .report-header {
+      box-shadow: none;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .filter-form {
+      display: none;
+    }
+
+    .summary-card {
+      page-break-inside: avoid;
+      box-shadow: none;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .report-header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .report-header-actions {
+      width: 100%;
+    }
+
+    .summary-card {
+      grid-template-columns: 1fr;
+    }
+
+    .summary-side {
+      border-top: 1px solid #edf2f7;
+      min-height: auto;
+      padding: 16px;
+    }
+
+    .summary-row {
+      grid-template-columns: 140px 1fr;
+    }
+
+    .report-title {
+      font-size: 24px;
+    }
+
+    .row {
+      grid-template-columns: 1fr;
+    }
+
+    .row > div[style*="align-self:end"] {
+      flex-direction: row;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="report-header">
+    <div class="report-header-left">
+      <img src="/static/philgeps.png" alt="logo"/>
+      <div class="report-header-content">
+        <div class="report-title">Daily Bid Summary</div>
+        <div class="report-sub">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M') if generated_at else '' }}</div>
+      </div>
+    </div>
+    <div class="report-header-actions no-print">
+      <a href="{{ url_for('reports_summary_csv') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download CSV</a>
+      <a href="{{ url_for('reports_summary_xlsx') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download Excel</a>
+      <a href="{{ url_for('reports_summary_pdf') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download PDF</a>
+      <button class="btn btn-primary" onclick="window.print()">Print</button>
+    </div>
+  </div>
+
+  <div class="no-print filter-form">
+    <form method="get" class="row g-2">
+      <div>
+        <label class="form-label">Date Added</label>
+        <input type="date" name="date_added" value="{{ filters.get('date_added','') }}">
+      </div>
+      <div>
+        <label class="form-label">Closing Date</label>
+        <input type="date" name="closing_date" value="{{ filters.get('closing_date','') }}">
+      </div>
+      <div>
+        <label class="form-label">Status</label>
+        <select name="status">
+          <option value="">All</option>
+          {% for v in statuses %}
+          <option value="{{ v }}" {% if filters.get('status')==v %}selected{% endif %}>{{ v }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Region</label>
+        <select name="region">
+          <option value="">All</option>
+          {% for v in regions %}
+          <option value="{{ v }}" {% if filters.get('region')==v %}selected{% endif %}>{{ v }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="form-label">System</label>
+        <select name="system_type">
+          <option value="">All</option>
+          {% for v in system_types %}
+          <option value="{{ v }}" {% if filters.get('system_type')==v %}selected{% endif %}>{{ v }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="align-self:end;">
+        <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
+        <a href="{{ url_for('reports_summary') }}" class="btn btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+  </div>
+
+  {% if not bids %}
+  <div class="empty-state">No bids matched the selected filters.</div>
+  {% else %}
+  {% for bid in bids %}
+  <div class="summary-card">
+    <div class="summary-main">
+      <div class="summary-row"><span class="label">Agency</span><span class="value">{{ bid.procuring_entity or '-' }}</span></div>
+      <div class="summary-row"><span class="label">ABC</span><span class="value currency">{{ bid.abc_value | format_currency }}</span></div>
+      <div class="summary-row"><span class="label">Type of Procurement</span><span class="value">{{ bid.procurement_mode or '-' }}</span></div>
+      <div class="summary-row"><span class="label">Address</span><span class="value">{{ bid.delivery_location or '-' }}</span></div>
+      <div class="summary-row"><span class="label">Deadline</span><span class="value">{{ bid.closing_date | format_date }}{% if bid.closing_time %} | {{ bid.closing_time | format_time }}{% endif %}</span></div>
+      <div class="summary-row"><span class="label">Project Title</span><span class="value">{{ bid.project_title or '-' }}</span></div>
+    </div>
+    <div class="summary-side">
+      <div class="status-box {% if bid.status %}{{ bid.status | lower }}{% endif %}">{{ bid.status or '-' }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+{% endblock %}

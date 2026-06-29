@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bid-monitoring-container">
+  <!-- Header Section -->
+  <div class="bid-header">
+    <div class="bid-header-content">
+      <div>
+        <h1 class="bid-title">Bid Monitoring</h1>
+        <p class="bid-subtitle">Browse, search, and filter bids from your procurement pipeline</p>
+      </div>
+      <a href="{{ url_for('bid_new') }}" class="btn-add-bid">
+        <span class="btn-icon">+</span> Add Bid
+      </a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Section -->
+  <div class="filter-section">
+    <form method="get" class="filter-form">
+      <div class="search-bar-wrapper">
+        <div class="search-input-container">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input 
+            type="search" 
+            name="search" 
+            class="search-input" 
+            value="{{ filters.search }}" 
+            placeholder="Search by reference, title, or entity..."
+          >
+        </div>
+        <button type="submit" class="btn-apply">Apply</button>
+        <a href="{{ url_for('bid_monitoring') }}" class="btn-clear">Clear</a>
+      </div>
+
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label class="filter-label">Status</label>
+          <select name="status" class="filter-select">
+            <option value="">All Status</option>
+            {% for value in statuses %}
+              <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Region</label>
+          <select name="region" class="filter-select">
+            <option value="">All Regions</option>
+            {% for value in regions %}
+              <option value="{{ value }}" {% if filters.region == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">System Type</label>
+          <select name="system_type" class="filter-select">
+            <option value="">All Systems</option>
+            {% for value in system_types %}
+              <option value="{{ value }}" {% if filters.system_type == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Category</label>
+          <select name="category" class="filter-select">
+            <option value="">All Categories</option>
+            {% for value in categories %}
+              <option value="{{ value }}" {% if filters.category == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Date Added</label>
+          <input type="date" name="date_added" class="filter-select" value="{{ filters.date_added }}">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Closing Date</label>
+          <input type="date" name="closing_date" class="filter-select" value="{{ filters.closing_date }}">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Priority</label>
+          <select name="priority" class="filter-select">
+            <option value="">All Priorities</option>
+            {% for value in priorities %}
+              <option value="{{ value }}" {% if filters.priority == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Canvassing</label>
+          <select name="canvassing_status" class="filter-select">
+            <option value="">All Status</option>
+            {% for value in canvassing_statuses %}
+              <option value="{{ value }}" {% if filters.canvassing_status == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Table -->
+  <div class="report-actions" style="margin:12px 0;">
+    <a href="{{ url_for('reports_summary') }}?{{ request.query_string.decode('utf-8') }}" target="_blank" class="btn btn-outline-primary">View Summary</a>
+    <a href="{{ url_for('reports_summary_csv') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download Excel (CSV)</a>
+    <a href="{{ url_for('reports_summary_pdf') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download PDF</a>
+  </div>
+  <div class="table-wrapper">
+    <table class="bids-table">
+      <thead>
+        <tr>
+          <th class="col-ref">Ref #</th>
+          <th class="col-date">Date Added</th>
+          <th class="col-title">Project Title</th>
+          <th class="col-entity">Entity</th>
+          <th class="col-system">System</th>
+          <th class="col-category">Category</th>
+          <th class="col-region">Region</th>
+          <th class="col-abc">ABC</th>
+          <th class="col-closing">Closing</th>
+          <th class="col-status">Status</th>
+          <th class="col-canvassing">Canvassing</th>
+          <th class="col-priority">Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bid in bids %}
+        <tr class="bid-row" onclick="location.href='{{ url_for("bid_detail", bid_id=bid.id) }}'">
+          <td class="ref-cell">{{ bid.reference_number }}</td>
+          <td class="date-cell">{{ bid.date_added | format_date }}</td>
+          <td class="title-cell">{{ bid.project_title }}</td>
+          <td class="entity-cell">{{ bid.procuring_entity }}</td>
+          <td class="system-cell">{{ bid.system_type }}</td>
+          <td class="category-cell">{{ bid.category }}</td>
+          <td class="region-cell">{{ bid.region }}</td>
+          <td class="currency-cell">{{ bid.abc_value | format_currency }}</td>
+          <td class="date-cell">
+            {{ bid.closing_date | format_date }}
+            {% if bid.closing_time %}
+            <div class="time-cell">{{ bid.closing_time | format_time }}</div>
+            {% endif %}
+          </td>
+          <td class="status-cell"><span class="badge badge-{{ bid.status | lower | replace(' ', '-') | replace('/', '-') }}">{{ bid.status }}</span></td>
+          <td class="canvassing-cell"><span class="badge badge-canvassing">{{ bid.canvassing_status or '-' }}</span></td>
+          <td class="priority-cell"><span class="priority priority-{{ bid.priority_level | lower | replace(' ', '-') | replace('/', '-') }}">{{ bid.priority_level }}</span></td>
+        </tr>
+        {% else %}
+        <tr class="no-results">
+          <td colspan="12">No bids found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-wrapper">
+    <nav class="pagination">
+      {% if pagination.has_prev %}
+      <a href="?page={{ pagination.prev_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}" class="pagination-btn">
+        ← Previous
+      </a>
+      {% else %}
+      <span class="pagination-btn disabled">← Previous</span>
+      {% endif %}
+
+      <div class="pagination-pages">
+        {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+          {% if page_num %}
+          <a 
+            href="?page={{ page_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}"
+            class="pagination-page {% if page_num == pagination.page %}active{% endif %}"
+          >
+            {{ page_num }}
+          </a>
+          {% else %}
+          <span class="pagination-ellipsis">…</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if pagination.has_next %}
+      <a href="?page={{ pagination.next_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}" class="pagination-btn">
+        Next →
+      </a>
+      {% else %}
+      <span class="pagination-btn disabled">Next →</span>
+      {% endif %}
+    </nav>
+  </div>
+</div>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .bid-monitoring-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 16px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #f9fbfd 100%);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .bid-header {
+    margin-bottom: 20px;
+  }
+
+  .bid-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .bid-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+    text-align: left;
+  }
+
+  .bid-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .btn-add-bid {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    white-space: nowrap;
+  }
+
+  .btn-add-bid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  }
+
+  .btn-icon {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  /* Filter Section */
+  .filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+  }
+
+  .filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-bar-wrapper {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-input-container {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 10px 10px 36px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #0f172a;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+  }
+
+  .filter-select {
+    padding: 8px 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #0f172a;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 16px;
+    padding-right: 28px;
+    text-align: left;
+  }
+
+  .filter-select:hover {
+    border-color: #cbd5e1;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-apply,
+  .btn-clear {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .btn-apply {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  }
+
+  .btn-apply:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-clear {
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-clear:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+  }
+
+  /* Table */
+  .table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+
+  .bids-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+  }
+
+  .bids-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .bids-table th {
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bids-table td {
+    padding: 10px 8px;
+    color: #475569;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Column-specific alignment */
+  .col-ref, .ref-cell { text-align: left; width: 70px; }
+  .col-date, .date-cell { text-align: center; width: 75px; }
+  .col-title, .title-cell { text-align: left; width: 140px; }
+  .col-entity, .entity-cell { text-align: left; width: 80px; }
+  .col-system, .system-cell { text-align: center; width: 70px; }
+  .col-category, .category-cell { text-align: left; width: 70px; }
+  .col-region, .region-cell { text-align: left; width: 60px; }
+  .col-abc, .currency-cell { text-align: right; width: 85px; }
+  .col-closing, .closing-cell { text-align: center; width: 75px; }
+  .col-status, .status-cell { text-align: center; width: 70px; }
+  .col-canvassing, .canvassing-cell { text-align: center; width: 70px; }
+  .col-priority, .priority-cell { text-align: center; width: 65px; }
+
+  .ref-cell {
+    font-weight: 600;
+    color: #0f172a;
+    font-family: 'Courier New', monospace;
+  }
+
+  .title-cell {
+    font-weight: 500;
+    color: #0f172a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .currency-cell {
+    font-weight: 600;
+    color: #059669;
+    font-family: 'Courier New', monospace;
+  }
+
+  .no-results {
+    text-align: center;
+    color: #94a3b8;
+    font-weight: 500;
+    padding: 30px 12px !important;
+  }
+
+  .bid-row {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .bid-row:hover {
+    background: #f8fafc;
+    transform: scale(1.001);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    white-space: nowrap;
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  .badge-active,
+  .badge-awarded,
+  .badge-completed,
+  .badge-interested,
+  .badge-for-review,
+  .badge-for-canvas,
+  .badge-new,
+  .badge-submitting,
+  .badge-submitted {
+    background: #dbeafe;
+    color: #1e3a8a;
+  }
+
+  .badge-pending,
+  .badge-under-evaluation {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .badge-cancelled,
+  .badge-closed {
+    background: #fecaca;
+    color: #7f1d1d;
+  }
+
+  .badge-canvassing {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  /* Priority */
+  .priority {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .priority-high {
+    background: #fecaca;
+    color: #7f1d1d;
+  }
+
+  .priority-medium {
+    background: #fcd34d;
+    color: #78350f;
+  }
+
+  .priority-low {
+    background: #d1d5db;
+    color: #1f2937;
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: white;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .pagination-btn:hover:not(.disabled) {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  }
+
+  .pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #94a3b8;
+  }
+
+  .pagination-pages {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .pagination-page {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: white;
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .pagination-page:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  .pagination-page.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+
+  .pagination-ellipsis {
+    padding: 0 4px;
+    color: #94a3b8;
+    font-weight: 500;
+    text-align: center;
+    font-size: 11px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .bid-monitoring-container {
+      padding: 16px 10px;
+    }
+
+    .bid-header-content {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .bid-title {
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .bid-subtitle {
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .filter-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .search-bar-wrapper {
+      flex-direction: column;
+    }
+
+    .search-input-container {
+      min-width: auto;
+    }
+
+    .col-ref, .ref-cell { width: 60px; }
+    .col-date, .date-cell { width: 70px; }
+    .col-title, .title-cell { width: 120px; }
+    .col-entity, .entity-cell { width: 70px; }
+    .col-category, .category-cell { width: 60px; }
+    .col-region, .region-cell { width: 55px; }
+    .col-abc, .currency-cell { width: 75px; }
+  }
+</style>
+{% endblock %}

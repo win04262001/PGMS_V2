@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Logbook</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+      animation: slideInDown 0.5s ease-out;
+    }
+
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+      font-size: 16px;
+      color: #718096;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      animation: slideInUp 0.5s ease-out;
+    }
+
+    .card-body {
+      padding: 28px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+
+    thead th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px;
+      text-align: left;
+      border: none;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background-color: #f8f9fa;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody td {
+      padding: 14px 12px;
+      font-size: 14px;
+      color: #4a5568;
+      vertical-align: middle;
+    }
+
+    .action-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .action-badge.login {
+      background-color: #c3dafe;
+      color: #2c5282;
+    }
+
+    .action-badge.logout {
+      background-color: #fed7d7;
+      color: #742a2a;
+    }
+
+    .ip-address {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+      color: #5a67d8;
+      background-color: #edf2f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      color: #718096;
+      line-height: 1.6;
+    }
+
+    .pagination-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pagination-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pagination-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .pagination-button:hover {
+      background: #5a67d8;
+    }
+
+    .pagination-button.disabled {
+      background: #cbd5e1;
+      color: #4a5568;
+      pointer-events: none;
+    }
+
+    .pagination-info {
+      color: #4a5568;
+      font-weight: 600;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-header h1 {
+        font-size: 24px;
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      thead th {
+        font-size: 12px;
+        padding: 12px 8px;
+      }
+
+      tbody td {
+        font-size: 13px;
+        padding: 10px 8px;
+      }
+
+      .table-responsive {
+        font-size: 12px;
+      }
+
+      .pagination-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .pagination-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .pagination-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease;
+      }
+
+      .pagination-button:hover {
+        background: #5a67d8;
+      }
+
+      .pagination-button.disabled {
+        background: #cbd5e1;
+        color: #4a5568;
+        pointer-events: none;
+      }
+
+      .pagination-info {
+        color: #4a5568;
+        font-weight: 600;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>Login Logbook</h1>
+      <p>Track user login and logout activity for the application.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        {% if logs %}
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>IP Address</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td><strong>{{ log.username }}</strong></td>
+                <td><span class="action-badge {{ log.action|lower }}">{{ log.action|capitalize }}</span></td>
+                <td><span class="ip-address">{{ log.ip_address or '-' }}</span></td>
+                <td>{{ log.user_agent or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-text">No login activity has been recorded yet.</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+    {% if pagination and (pagination.has_prev or pagination.has_next) %}
+    <div class="pagination-container">
+      <nav class="pagination-nav">
+        {% if pagination.has_prev %}
+        <a href="?page={{ pagination.prev_num }}" class="pagination-button">← Previous</a>
+        {% else %}
+        <span class="pagination-button disabled">← Previous</span>
+        {% endif %}
+
+        <span class="pagination-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+        {% if pagination.has_next %}
+        <a href="?page={{ pagination.next_num }}" class="pagination-button">Next →</a>
+        {% else %}
+        <span class="pagination-button disabled">Next →</span>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+</body>
+</html>
+{% endblock %}

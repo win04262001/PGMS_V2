@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #2c3e50;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    gap: 0.75rem;
+    color: #764ba2;
+  }
+
+  .card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .field-group {
+    margin-bottom: 2rem;
+  }
+
+  .field-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .field-value {
+    font-size: 1rem;
+    color: #2c3e50;
+    line-height: 1.6;
+    background: #f8fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #667eea;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: #667eea;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-outline-secondary {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+  }
+
+  .btn-outline-secondary:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .btn-outline-info {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+  }
+
+  .btn-outline-info:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .file-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .file-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  .description-box {
+    background: #f8fafb;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #667eea;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 1.5rem 1rem;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="container">
+  <a href="{{ url_for('pre_documents_list') }}" class="back-link">
+    <span>←</span> Back to pre documents
+  </a>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ doc.title }}</h2>
+    </div>
+    
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field-label">Supplier Name</div>
+        <div class="field-value">{{ doc.supplier_name or '-' }}</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Description</div>
+        <div class="description-box">
+          {{ doc.description or '-' }}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Uploaded</div>
+        <div class="field-value">{{ doc.upload_date.strftime('%Y-%m-%d %H:%M') }}</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="button-group">
+          <a href="{{ url_for('pre_document_view', filename=doc.filename) }}" target="_blank" class="btn btn-primary">View Document</a>
+          <a href="{{ url_for('pre_document_download', filename=doc.filename) }}" class="btn btn-outline-secondary">Download</a>
+          <button type="button" class="btn btn-outline-info" onclick="window.print()">Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

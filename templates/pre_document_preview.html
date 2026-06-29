@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="mb-3">Preview not available</h2>
+      <p>The selected file cannot be displayed inline in your browser.</p>
+      <p class="text-muted">You can still download it using the button below.</p>
+      <div class="mt-4">
+        <a href="{{ url_for('pre_document_download', filename=doc.filename) }}" class="btn btn-primary">Download Document</a>
+        <a href="{{ url_for('pre_documents_list') }}" class="btn btn-outline-secondary ms-2">Back to Pre Documents</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

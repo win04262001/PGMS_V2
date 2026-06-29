@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #2c3e50;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .header-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .header-text p {
+    opacity: 0.9;
+    font-size: 1rem;
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead tr {
+    background: #f8fafb;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s ease;
+  }
+
+  tbody tr:hover {
+    background-color: #f8fafb;
+  }
+
+  .title-cell {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .description-cell {
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .date-cell {
+    color: #718096;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-outline-primary {
+    background: white;
+    color: #667eea;
+    border: 1px solid #667eea;
+  }
+
+  .btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .btn-outline-secondary {
+    background: white;
+    color: #667eea;
+    border: 1px solid #667eea;
+  }
+
+  .btn-outline-secondary:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #718096;
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      padding: 2rem 1.5rem;
+    }
+
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header-text h1 {
+      font-size: 1.5rem;
+    }
+
+    .btn-success {
+      width: 100%;
+      text-align: center;
+    }
+
+    table {
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 0.75rem;
+    }
+
+    .actions {
+      flex-direction: column;
+    }
+
+    .btn-sm {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="header">
+  <div class="header-content">
+    <div class="header-text">
+      <h1>Requirement Documents</h1>
+      <p>Store and access requirement files and descriptions here</p>
+    </div>
+    <a href="{{ url_for('requirement_new') }}" class="btn btn-success">+ Add Requirement</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      {% if docs %}
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in docs %}
+            <tr>
+              <td class="title-cell">{{ doc.title }}</td>
+              <td class="description-cell">{{ doc.description or '-' }}</td>
+              <td class="date-cell">{{ doc.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td class="actions">
+                <a href="{{ url_for('requirement_view', filename=doc.filename) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="{{ url_for('requirement_download', filename=doc.filename) }}" class="btn btn-sm btn-outline-secondary">Download</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📄</div>
+        <p>No requirement documents uploaded yet</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
