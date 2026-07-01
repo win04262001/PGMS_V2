@@ -36,9 +36,32 @@ class Bid(db.Model):
     abc_flag = db.Column(db.String(64), nullable=True)
     recommendation = db.Column(db.String(128), nullable=True)
     attachments = db.Column(db.String(2048), nullable=True)
+    rfq_source = db.Column(db.String(32), nullable=True, default='online')  # 'online' or 'walk-in'
+    pr_number = db.Column(db.String(64), nullable=True)  # For walk-in RFQs
+    office_department = db.Column(db.String(255), nullable=True)
+    supplier_name = db.Column(db.String(255), nullable=True)
+    company_address = db.Column(db.Text, nullable=True)
+    contact_email = db.Column(db.String(255), nullable=True)
+    contact_phone = db.Column(db.String(32), nullable=True)
 
     def __repr__(self):
         return f'<Bid {self.reference_number}>'
+
+
+class BidAttachment(db.Model):
+    __tablename__ = 'bid_attachments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    bid_id = db.Column(db.Integer, db.ForeignKey('bids.id'), nullable=False)
+    filename = db.Column(db.String(1024), nullable=False)
+    original_filename = db.Column(db.String(1024), nullable=False)
+    attachment_type = db.Column(db.String(64), nullable=True)  # 'scanned_rfq', 'quotation', etc.
+    upload_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    file_size = db.Column(db.Integer, nullable=True)
+    file_path = db.Column(db.String(2048), nullable=True)
+
+    def __repr__(self):
+        return f'<BidAttachment {self.original_filename}>'
 
 
 class RequirementDocument(db.Model):

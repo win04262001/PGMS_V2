@@ -58,16 +58,28 @@
 
   .form-card {
     background: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 1.5rem;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e2e8f0;
     overflow: hidden;
   }
 
   .form-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    padding: 1.5rem;
+    padding: 1.75rem 2rem;
     color: white;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .form-header h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .form-body {
+    padding: 2rem;
+    background: #f8fafc;
   }
 
   .form-header h2 {
@@ -78,6 +90,53 @@
 
   .form-body {
     padding: 2rem;
+  }
+
+  .edit-bid-modal .modal-content {
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .edit-bid-modal .modal-header {
+    padding: 24px 28px;
+  }
+
+  .edit-bid-modal .modal-body {
+    background: #f8fafc;
+    padding: 0;
+  }
+
+  .modal-panel {
+    padding: 20px 28px 0;
+  }
+
+  .modal-panel-steps {
+    display: block;
+  }
+
+  .panel-section {
+    padding: 20px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .panel-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 16px;
+  }
+
+  .panel-section .form-section-description {
+    font-size: 0.94rem;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .panel-section.show {
+    display: block;
+  }
+
+  .panel-section.hidden {
+    display: none;
   }
 
   .form-section {
@@ -253,6 +312,138 @@
     text-decoration: underline;
   }
 
+  .rfq-type-selector {
+    display: flex;
+    gap: 14px;
+    padding: 20px 0 20px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+  }
+
+  .rfq-option {
+    flex: 1;
+    padding: 18px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-height: 106px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .rfq-option strong {
+    display: block;
+    font-size: 1rem;
+    color: #0f172a;
+  }
+
+  .rfq-option span {
+    display: block;
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .rfq-option.active {
+    border-color: #2563eb;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+    background: #eff6ff;
+  }
+
+  .form-section-description {
+    font-size: 0.92rem;
+    color: #475569;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .rfq-type-selector label:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-section.walk-in-only,
+  .form-section.online-only {
+    display: none;
+  }
+
+  .form-section.walk-in-only.show,
+  .form-section.online-only.show {
+    display: block;
+  }
+
+  .form-section-description {
+    font-size: 0.92rem;
+    color: #475569;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .file-upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .file-upload-zone:hover {
+    border-color: var(--primary);
+    background: #f3f4f6;
+  }
+
+  .file-upload-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.05);
+  }
+
+  .file-list {
+    margin-top: 1rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .file-item:last-child {
+    border-bottom: none;
+  }
+
+  .file-item-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .file-item-name span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+  }
+
+  .file-item-remove {
+    color: var(--danger);
+    cursor: pointer;
+    font-weight: 600;
+  }
+
   @media (max-width: 768px) {
     .form-grid {
       grid-template-columns: 1fr;
@@ -276,6 +467,7 @@
   }
 </style>
 
+{% if not edit_mode %}
 <div class="back-link" onclick="window.history.back(); return false;">
   ← Back to list
 </div>
@@ -284,51 +476,74 @@
   <h1 class="page-title">{{ 'Edit Bid' if edit_mode else 'Add New Bid' }}</h1>
   <p class="page-subtitle">Manage bid details and track procurement opportunities</p>
 </div>
+{% endif %}
 
+{% if edit_mode %}
+<div class="modal fade edit-bid-modal" id="editBidModal" tabindex="-1" aria-labelledby="editBidModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-bottom: 0;">
+        <div>
+          <h5 class="modal-title" id="editBidModalLabel">Edit Bid</h5>
+          <div class="modal-subtitle" style="font-size: 0.95rem; opacity: 0.85; margin-top: 0.25rem;">Update the bid details using the same modal layout as Add Bid.</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <form method="post" action="{{ form_action }}" enctype="multipart/form-data" id="bidForm">
+          <div class="modal-panel">
+            <div class="modal-panel-steps">
+{% endif %}
+
+{% if not edit_mode %}
 <div class="form-card">
   <div class="form-header">
     <h2>{{ 'Update Bid Information' if edit_mode else 'Create New Bid' }}</h2>
   </div>
 
   <div class="form-body">
-    <form method="post" action="{{ form_action }}" enctype="multipart/form-data">
+    <form method="post" action="{{ form_action }}" enctype="multipart/form-data" id="bidForm">
+{% endif %}
 
-      <!-- Basic Information Section -->
-      <div class="form-section">
-        <div class="form-section-title">Basic Information</div>
+      <!-- RFQ Source Type Selector -->
+      <div class="rfq-type-selector">
+        <label class="rfq-option" data-value="online">
+          <input type="radio" name="rfq_source" value="online" hidden {% if form_data.get('rfq_source', 'online') == 'online' %}checked{% endif %}>
+          <strong>Online RFQ</strong>
+          <span>PhilGEPS / MGEPS online posting</span>
+        </label>
+        <label class="rfq-option" data-value="walk-in">
+          <input type="radio" name="rfq_source" value="walk-in" hidden {% if form_data.get('rfq_source') == 'walk-in' %}checked{% endif %}>
+          <strong>Walk-In RFQ</strong>
+          <span>Physical document entry with supplier details</span>
+        </label>
+      </div>
+
+      <!-- Bid Summary -->
+      <div class="form-section panel-section">
+        <div class="form-section-title">Bid Summary</div>
+        <div class="form-section-description">Start with the reference, title, entity and channel so the bid is easy to identify.</div>
         <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Date Monitored</label>
-            <input type="date" name="date_monitored" class="form-control" value="{{ form_data.get('date_monitored') or '' }}">
-          </div>
           <div class="form-group">
             <label class="form-label">Reference / Notice Reference Number *</label>
             <input type="text" name="reference_number" class="form-control" value="{{ form_data.get('reference_number') or '' }}" required>
           </div>
           <div class="form-group">
-            <label class="form-label">System Type</label>
-            <select name="system_type" class="form-select">
-              <option value="Philgeps" {% if form_data.get('system_type') == 'Philgeps' %}selected{% endif %}>Philgeps</option>
-              <option value="Mgeps" {% if form_data.get('system_type') == 'Mgeps' %}selected{% endif %}>Mgeps</option>
-            </select>
+            <label class="form-label">Project Title</label>
+            <input type="text" name="project_title" class="form-control" value="{{ form_data.get('project_title') or '' }}">
           </div>
           <div class="form-group">
             <label class="form-label">Procuring Entity</label>
             <input type="text" name="procuring_entity" class="form-control" value="{{ form_data.get('procuring_entity') or '' }}">
           </div>
-        </div>
-      </div>
-
-      <!-- Project Details -->
-      <div class="form-section">
-        <div class="form-section-title">Project Details</div>
-        <div class="form-grid full">
-          <div class="form-group">
-            <label class="form-label">Project Title</label>
-            <input type="text" name="project_title" class="form-control" value="{{ form_data.get('project_title') or '' }}">
+          <div class="form-group online-only system-type-field show">
+            <label class="form-label">System Type</label>
+            <select name="system_type" class="form-select">
+              <option value="Philgeps" {% if form_data.get('system_type') == 'Philgeps' %}selected{% endif %}>Philgeps</option>
+              <option value="Mgeps" {% if form_data.get('system_type') == 'Mgeps' %}selected{% endif %}>Mgeps</option>
+            </select>
+            <div class="form-text">Show system type only for online RFQ entries.</div>
           </div>
-        </div>
-        <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Category</label>
             <input list="category-list" name="category" class="form-control" value="{{ form_data.get('category') or '' }}" placeholder="Enter or select">
@@ -354,9 +569,10 @@
         </div>
       </div>
 
-      <!-- Mgeps Details -->
-      <div class="form-section">
-        <div class="form-section-title">Mgeps Details</div>
+      <!-- Online RFQ Details -->
+      <div class="form-section panel-section panel-online show">
+        <div class="form-section-title">Online RFQ Details</div>
+        <div class="form-section-description">Fields below apply only to online bid postings through PhilGEPS or MGEPS.</div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Control Number</label>
@@ -387,7 +603,7 @@
       </div>
 
       <!-- Financial Information -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Financial Information</div>
         <div class="form-grid">
           <div class="form-group">
@@ -412,7 +628,7 @@
       </div>
 
       <!-- Timeline -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Timeline & Deadlines</div>
         <div class="form-grid">
           <div class="form-group">
@@ -435,7 +651,7 @@
       </div>
 
       <!-- Status & Priority -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Status & Priority</div>
         <div class="form-grid">
           <div class="form-group">
@@ -469,8 +685,9 @@
       </div>
 
       <!-- Results & Scoring -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Results & Scoring</div>
+        <div class="form-section-description">Record outcome details and opportunity score to track bid performance.</div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Result</label>
@@ -483,13 +700,13 @@
           </div>
           <div class="form-group">
             <label class="form-label">Opportunity Score</label>
-            <input type="number" name="opportunity_score" class="form-control" value="{{ form_data.get('opportunity_score') or '' }}">
+            <input type="number" name="opportunity_score" class="form-control" value="{{ form_data.get('opportunity_score') or '' }}" placeholder="0-100">
           </div>
         </div>
       </div>
 
       <!-- Additional Notes -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Additional Information</div>
         <div class="form-grid full">
           <div class="form-group">
@@ -506,16 +723,15 @@
       </div>
 
       <!-- Attachments -->
-      <div class="form-section">
+      <div class="form-section panel-section">
         <div class="form-section-title">Attachments</div>
         <div class="form-grid full">
           <div class="form-group">
-            <label class="form-label">Upload Files</label>
+            <label class="form-label">Upload Supporting Files</label>
             <input type="file" name="attachments" class="form-control" multiple>
-            <div class="form-text">Upload PDF, DOCX, XLSX, images, or text files.</div>
+            <div class="form-text">Upload PDF, JPG, PNG, DOCX, or XLSX files as needed.</div>
           </div>
         </div>
-
         {% if edit_mode and bid and bid.attachments %}
         <div class="existing-attachments">
           <label class="form-label">Existing Attachments</label>
@@ -528,17 +744,79 @@
         {% endif %}
       </div>
 
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
-        <button type="submit" class="btn btn-primary">{{ 'Update Bid' if edit_mode else 'Create Bid' }}</button>
+      <!-- Walk-In RFQ Section -->
+      <div class="form-section panel-section panel-walkin hidden">
+        <div class="form-section-title">Walk-In RFQ Details</div>
+        <div class="form-section-description">Enter the physical RFQ details for walk-in submissions, including supplier contact information.</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">P.R. Number</label>
+            <input type="text" name="pr_number" class="form-control" value="{{ form_data.get('pr_number') or '' }}" placeholder="Enter PR number">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Office / Department</label>
+            <input type="text" name="office_department" class="form-control" value="{{ form_data.get('office_department') or '' }}" placeholder="Office or department name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Supplier / Company Name</label>
+            <input type="text" name="supplier_name" class="form-control" value="{{ form_data.get('supplier_name') or '' }}" placeholder="Vendor name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company Address</label>
+            <input type="text" name="company_address" class="form-control" value="{{ form_data.get('company_address') or '' }}" placeholder="Supplier address">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Email</label>
+            <input type="email" name="contact_email" class="form-control" value="{{ form_data.get('contact_email') or '' }}" placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            <input type="tel" name="contact_phone" class="form-control" value="{{ form_data.get('contact_phone') or '' }}" placeholder="(+63) 912 345 6789">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Procurement Mode</label>
+            <select name="procurement_mode" class="form-select">
+              <option value="">Select procurement mode</option>
+              <option value="Small Value Procurement" {% if form_data.get('procurement_mode') == 'Small Value Procurement' %}selected{% endif %}>Small Value Procurement</option>
+              <option value="Public Bidding" {% if form_data.get('procurement_mode') == 'Public Bidding' %}selected{% endif %}>Public Bidding</option>
+              <option value="Negotiated Procurement" {% if form_data.get('procurement_mode') == 'Negotiated Procurement' %}selected{% endif %}>Negotiated Procurement</option>
+            </select>
+          </div>
+        </div>
       </div>
 
+      <!-- Form Actions -->
+      {% if edit_mode %}
+      </div>
+      <div class="modal-footer justify-content-between px-4 py-3">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Bid</button>
+      </div>
+      {% else %}
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+        <button type="submit" class="btn btn-primary">{{ 'Create Bid' if not edit_mode else 'Update Bid' }}</button>
+      </div>
+      {% endif %}
+
     </form>
+{% if not edit_mode %}
   </div>
 </div>
+{% endif %}
+
+{% if edit_mode %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <script>
+  const selectedFiles = new Map();
+
   function updateDaysRemaining() {
     const closingDateInput = document.querySelector('input[name="closing_date"]');
     const daysRemainingInput = document.querySelector('input[name="days_remaining"]');
@@ -558,11 +836,180 @@
     daysRemainingInput.value = Number.isNaN(diffDays) ? '' : diffDays;
   }
 
+
+  function updateFileList() {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+    
+    if (selectedFiles.size === 0) {
+      fileList.style.display = 'none';
+      return;
+    }
+    
+    fileList.style.display = 'block';
+    selectedFiles.forEach((file, name) => {
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <div class="file-item-name">
+          <span>📄</span>
+          <span title="${name}">${name}</span>
+        </div>
+        <div class="file-item-remove" onclick="removeFile('${name}')">✕ Remove</div>
+      `;
+      fileList.appendChild(item);
+    });
+  }
+
+  function removeFile(filename) {
+    selectedFiles.delete(filename);
+    updateFileList();
+  }
+
+  function handleFiles(files) {
+    for (let file of files) {
+      if (file.size > 52428800) { // 50MB
+        alert(`File ${file.name} is too large (max 50MB)`);
+        continue;
+      }
+      selectedFiles.set(file.name, file);
+    }
+    updateFileList();
+  }
+
+  function submitForm() {
+    const form = document.getElementById('bidForm');
+    if (selectedFiles.size === 0) {
+      form.submit();
+      return;
+    }
+
+    const formData = new FormData(form);
+    
+    selectedFiles.forEach((file) => {
+      formData.append('file_attachments', file);
+    });
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          window.location.reload();
+        }
+      } else {
+        alert('Error saving bid');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    // RFQ Type selector
+    const rfqOptions = document.querySelectorAll('.rfq-option');
+    const radioInputs = document.querySelectorAll('input[name="rfq_source"]');
+
+    const togglePanelFields = (panel, enabled) => {
+      if (!panel) return;
+      panel.querySelectorAll('input, select, textarea').forEach(field => {
+        field.disabled = !enabled;
+      });
+    };
+
+    const setSource = (value) => {
+      rfqOptions.forEach(option => {
+        option.classList.toggle('active', option.dataset.value === value);
+      });
+      document.querySelectorAll('.panel-online').forEach(section => {
+        const show = value === 'online';
+        section.classList.toggle('show', show);
+        section.classList.toggle('hidden', !show);
+        togglePanelFields(section, show);
+      });
+      document.querySelectorAll('.panel-walkin').forEach(section => {
+        const show = value === 'walk-in';
+        section.classList.toggle('show', show);
+        section.classList.toggle('hidden', !show);
+        togglePanelFields(section, show);
+      });
+      document.querySelectorAll('.system-type-field').forEach(field => {
+        field.style.display = value === 'online' ? 'block' : 'none';
+      });
+      radioInputs.forEach(input => {
+        input.checked = input.value === value;
+      });
+    };
+
+    rfqOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        setSource(option.dataset.value);
+      });
+    });
+
+    // initialize selected state for edit page
+    const selectedValue = document.querySelector('input[name="rfq_source"]:checked');
+    if (selectedValue) {
+      setSource(selectedValue.value);
+    } else {
+      setSource('online');
+    }
+
+    {% if edit_mode %}
+    const editBidModalEl = document.getElementById('editBidModal');
+    if (editBidModalEl) {
+      const editModal = new bootstrap.Modal(editBidModalEl);
+      editModal.show();
+      editBidModalEl.addEventListener('hidden.bs.modal', function () {
+        window.location.href = '{{ url_for("bid_detail", bid_id=bid.id) if edit_mode else url_for("bid_monitoring") }}';
+      });
+    }
+    {% endif %}
+
+    // File upload zone
+    const fileUploadZone = document.getElementById('fileUploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    if (fileUploadZone && fileInput) {
+      fileUploadZone.addEventListener('click', () => fileInput.click());
+
+      fileUploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadZone.classList.add('drag-over');
+      });
+
+      fileUploadZone.addEventListener('dragleave', () => {
+        fileUploadZone.classList.remove('drag-over');
+      });
+
+      fileUploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadZone.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+      });
+    }
+
+    // Days remaining calculation
     const closingDateInput = document.querySelector('input[name="closing_date"]');
     if (closingDateInput) {
       closingDateInput.addEventListener('change', updateDaysRemaining);
       updateDaysRemaining();
+    }
+
+    // Form submission
+    const bidForm = document.getElementById('bidForm');
+    if (bidForm) {
+      bidForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitForm();
+      });
     }
   });
 </script>

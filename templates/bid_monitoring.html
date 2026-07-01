@@ -8,13 +8,235 @@
         <h1 class="bid-title">Bid Monitoring</h1>
         <p class="bid-subtitle">Browse, search, and filter bids from your procurement pipeline</p>
       </div>
-      <a href="{{ url_for('bid_new') }}" class="btn-add-bid">
+      <button type="button" class="btn-add-bid" data-bs-toggle="modal" data-bs-target="#addBidModal">
         <span class="btn-icon">+</span> Add Bid
-      </a>
+      </button>
+    </div>
+  </div>
+
+  <!-- Add Bid Modal -->
+  <div class="modal fade add-bid-modal" id="addBidModal" tabindex="-1" aria-labelledby="addBidModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-bottom: 0;">
+          <div>
+            <h5 class="modal-title" id="addBidModalLabel">Add New Bid</h5>
+            <div class="modal-subtitle" style="font-size: 0.95rem; opacity: 0.85; margin-top: 0.25rem;">Choose RFQ source.</div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <form id="addBidForm" method="post" action="{{ url_for('bid_new') }}" enctype="multipart/form-data">
+            <div class="modal-panel">
+              <div class="modal-panel-steps">
+                <div class="rfq-type-selector">
+                  <label class="rfq-option active" data-value="online">
+                    <input type="radio" name="rfq_source" value="online" checked hidden>
+                    <strong>Online RFQ</strong>
+                    <span>PhilGEPS / MGEPS online posting</span>
+                  </label>
+                  <label class="rfq-option" data-value="walk-in">
+                    <input type="radio" name="rfq_source" value="walk-in" hidden>
+                    <strong>Walk-In RFQ</strong>
+                    <span>Physical document entry with supplier details</span>
+                  </label>
+                </div>
+
+                <div class="form-section panel-section">
+                  <div class="form-section-title">Bid Summary</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label">Reference Number *</label>
+                      <input type="text" name="reference_number" class="form-control" placeholder="Enter reference or notice number" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Project Title</label>
+                      <input type="text" name="project_title" class="form-control" placeholder="Enter project title">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Procuring Entity</label>
+                      <input type="text" name="procuring_entity" class="form-control" placeholder="Agency or office name">
+                    </div>
+                    <div class="form-group system-type-field">
+                      <label class="form-label">System Type</label>
+                      <select name="system_type" class="form-select">
+                        <option value="Philgeps">PhilGEPS</option>
+                        <option value="Mgeps">MGEPS</option>
+                      </select>
+                      <div class="form-text" style="margin-top: 0.5rem;">Only needed for online RFQ entries.</div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Category</label>
+                      <input list="category-list" name="category" class="form-control" placeholder="Type or select category">
+                      <datalist id="category-list">
+                        {% for value in categories %}
+                          <option value="{{ value }}"></option>
+                        {% endfor %}
+                      </datalist>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Region</label>
+                      <select name="region" class="form-select">
+                        <option value="">Select region</option>
+                        {% for value in regions %}
+                          <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section panel-section panel-online show">
+                  <div class="form-section-title">Online RFQ Details</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label">Control Number</label>
+                      <input type="text" name="control_number" class="form-control" placeholder="PhilGEPS/MGEPS control number">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Procurement Mode</label>
+                      <select name="procurement_mode" class="form-select">
+                        <option value="">Select procurement mode</option>
+                        <option value="Small Value Procurement">Small Value Procurement</option>
+                        <option value="Public Bidding">Public Bidding</option>
+                        <option value="Negotiated Procurement">Negotiated Procurement</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Delivery / Project Location</label>
+                      <input type="text" name="delivery_location" class="form-control" placeholder="Enter location">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Contact Person</label>
+                      <input type="text" name="contact_person" class="form-control" placeholder="Name of contact person">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Date Monitored</label>
+                      <input type="date" name="date_monitored" class="form-control">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section panel-section panel-walkin hidden">
+                  <div class="form-section-title">Walk-In RFQ Details</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label">P.R. Number</label>
+                      <input type="text" name="pr_number" class="form-control" placeholder="Enter PR number">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Office / Department</label>
+                      <input type="text" name="office_department" class="form-control" placeholder="Office or department name">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Supplier / Company Name</label>
+                      <input type="text" name="supplier_name" class="form-control" placeholder="Vendor name">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Company Address</label>
+                      <input type="text" name="company_address" class="form-control" placeholder="Supplier address">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Contact Email</label>
+                      <input type="email" name="contact_email" class="form-control" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Contact Phone</label>
+                      <input type="tel" name="contact_phone" class="form-control" placeholder="(+63) 912 345 6789">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Procurement Mode</label>
+                      <select name="procurement_mode" class="form-select">
+                        <option value="">Select procurement mode</option>
+                        <option value="Small Value Procurement">Small Value Procurement</option>
+                        <option value="Public Bidding">Public Bidding</option>
+                        <option value="Negotiated Procurement">Negotiated Procurement</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section panel-section">
+                  <div class="form-section-title">Financial & Deadline Details</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label">ABC Value (₱)</label>
+                      <input type="number" step="0.01" min="0" name="abc_value" class="form-control" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Closing Date</label>
+                      <input type="date" name="closing_date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Closing Time</label>
+                      <input type="time" name="closing_time" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Priority</label>
+                      <select name="priority_level" class="form-select">
+                        <option value="">Select priority</option>
+                        {% for value in priorities %}
+                          <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select name="status" class="form-select">
+                        <option value="">Select status</option>
+                        {% for value in statuses %}
+                          <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Canvassing Status</label>
+                      <select name="canvassing_status" class="form-select">
+                        <option value="">Select canvassing status</option>
+                        {% for value in canvassing_statuses %}
+                          <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section panel-section">
+                  <div class="form-section-title">Additional Notes</div>
+                  <div class="form-grid full">
+                    <div class="form-group">
+                      <label class="form-label">Remarks</label>
+                      <textarea name="remarks" class="form-control" placeholder="Optional notes or remarks"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Recommendation</label>
+                      <textarea name="recommendation" class="form-control" placeholder="Optional recommendation"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section panel-section">
+                  <div class="form-section-title">Attachments</div>
+                  <div class="form-group">
+                    <label class="form-label">Upload Supporting Files</label>
+                    <input type="file" name="attachments" class="form-control" multiple>
+                    <div class="form-text">Upload PDF, JPG, PNG, or DOCX files as needed.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between px-4 py-3">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create Bid</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Search & Filter Section -->
+  <div class="full-bleed">
   <div class="filter-section">
     <form method="get" class="filter-form">
       <div class="search-bar-wrapper">
@@ -105,13 +327,22 @@
             {% endfor %}
           </select>
         </div>
+
+        <div class="filter-group">
+          <label class="filter-label">RFQ Source</label>
+          <select name="rfq_source" class="filter-select">
+            <option value="">All Sources</option>
+            <option value="online" {% if filters.rfq_source == 'online' %}selected{% endif %}>Online (PhilGEPS/MGEPS)</option>
+            <option value="walk-in" {% if filters.rfq_source == 'walk-in' %}selected{% endif %}>Walk-In</option>
+          </select>
+        </div>
       </div>
     </form>
   </div>
 
   <!-- Results Table -->
   <div class="report-actions" style="margin:12px 0;">
-    <a href="{{ url_for('reports_summary') }}?{{ request.query_string.decode('utf-8') }}" target="_blank" class="btn btn-outline-primary">View Summary</a>
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#summaryModal">View Summary</button>
     <a href="{{ url_for('reports_summary_csv') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download Excel (CSV)</a>
     <a href="{{ url_for('reports_summary_pdf') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download PDF</a>
   </div>
@@ -124,6 +355,7 @@
           <th class="col-title">Project Title</th>
           <th class="col-entity">Entity</th>
           <th class="col-system">System</th>
+          <th class="col-source">RFQ Source</th>
           <th class="col-category">Category</th>
           <th class="col-region">Region</th>
           <th class="col-abc">ABC</th>
@@ -141,6 +373,13 @@
           <td class="title-cell">{{ bid.project_title }}</td>
           <td class="entity-cell">{{ bid.procuring_entity }}</td>
           <td class="system-cell">{{ bid.system_type }}</td>
+          <td class="source-cell">
+            {% if bid.rfq_source == 'walk-in' %}
+            <span class="badge" style="background: #f59e0b; color: white;">Walk-In</span>
+            {% else %}
+            <span class="badge" style="background: #3b82f6; color: white;">Online</span>
+            {% endif %}
+          </td>
           <td class="category-cell">{{ bid.category }}</td>
           <td class="region-cell">{{ bid.region }}</td>
           <td class="currency-cell">{{ bid.abc_value | format_currency }}</td>
@@ -156,18 +395,19 @@
         </tr>
         {% else %}
         <tr class="no-results">
-          <td colspan="12">No bids found.</td>
+          <td colspan="13">No bids found.</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
   </div>
 
   <!-- Pagination -->
   <div class="pagination-wrapper">
     <nav class="pagination">
       {% if pagination.has_prev %}
-      <a href="?page={{ pagination.prev_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}" class="pagination-btn">
+      <a href="?page={{ pagination.prev_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}&rfq_source={{ filters.rfq_source }}" class="pagination-btn">
         ← Previous
       </a>
       {% else %}
@@ -178,7 +418,7 @@
         {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
           {% if page_num %}
           <a 
-            href="?page={{ page_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}"
+            href="?page={{ page_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}&rfq_source={{ filters.rfq_source }}"
             class="pagination-page {% if page_num == pagination.page %}active{% endif %}"
           >
             {{ page_num }}
@@ -190,29 +430,162 @@
       </div>
 
       {% if pagination.has_next %}
-      <a href="?page={{ pagination.next_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}" class="pagination-btn">
+      <a href="?page={{ pagination.next_num }}&search={{ filters.search }}&status={{ filters.status }}&region={{ filters.region }}&category={{ filters.category }}&priority={{ filters.priority }}&system_type={{ filters.system_type }}&canvassing_status={{ filters.canvassing_status }}&date_added={{ filters.date_added }}&closing_date={{ filters.closing_date }}&rfq_source={{ filters.rfq_source }}" class="pagination-btn">
         Next →
       </a>
       {% else %}
       <span class="pagination-btn disabled">Next →</span>
       {% endif %}
     </nav>
+    </div>
+    <!-- Results Table -->
+    <div class="modal fade summary-modal" id="summaryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+      <div class="modal-header summary-modal-header">
+        <div>
+          <h5 class="modal-title">Summary Report</h5>
+          <div class="summary-modal-subtitle">Filtered view for the current selection</div>
+        </div>
+        <div class="summary-modal-actions">
+          <button type="button" class="summary-minimize-btn" aria-label="Minimize summary">▁</button>
+          <button type="button" class="summary-close-btn" data-bs-dismiss="modal" aria-label="Close">✕</button>
+        </div>
+      </div>
+      <div class="modal-body p-0">
+        <iframe id="summaryReportFrame" title="Summary Report" loading="lazy"></iframe>
+      </div>
+    </div>
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('summaryModal');
+    const frame = document.getElementById('summaryReportFrame');
+    const minimizeBtn = document.querySelector('.summary-minimize-btn');
+    const modalBody = document.querySelector('.summary-modal .modal-body');
+    const modalDialog = document.querySelector('.summary-modal .modal-dialog');
+
+    if (!modal || !frame || !modalDialog) return;
+
+    const toggleMinimize = function () {
+      const isMinimized = modalDialog.classList.toggle('summary-minimized');
+      const button = document.querySelector('.summary-minimize-btn');
+      if (button) {
+        button.textContent = isMinimized ? '▢' : '▁';
+        button.setAttribute('aria-label', isMinimized ? 'Expand summary' : 'Minimize summary');
+      }
+    };
+
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener('click', toggleMinimize);
+    }
+
+    modal.addEventListener('shown.bs.modal', function () {
+      const query = window.location.search || '';
+      const normalized = query.replace(/^\?/, '');
+      frame.src = '/reports/summary?modal=1' + (normalized ? '&' + normalized : '');
+      modalDialog.classList.remove('summary-minimized');
+      if (minimizeBtn) {
+        minimizeBtn.textContent = '▁';
+        minimizeBtn.setAttribute('aria-label', 'Minimize summary');
+      }
+    });
+
+    modal.addEventListener('hidden.bs.modal', function () {
+      frame.removeAttribute('src');
+      modalDialog.classList.remove('summary-minimized');
+      if (minimizeBtn) {
+        minimizeBtn.textContent = '▁';
+        minimizeBtn.setAttribute('aria-label', 'Minimize summary');
+      }
+    });
+
+    // Add Bid modal toggle logic
+    const addBidModal = document.getElementById('addBidModal');
+    if (addBidModal) {
+      const options = addBidModal.querySelectorAll('.rfq-option');
+      const onlinePanel = addBidModal.querySelector('.panel-online');
+      const walkinPanel = addBidModal.querySelector('.panel-walkin');
+      const radioInputs = addBidModal.querySelectorAll('input[name="rfq_source"]');
+
+      const togglePanelFields = (panel, enabled) => {
+        if (!panel) return;
+        panel.querySelectorAll('input, select, textarea').forEach(field => {
+          field.disabled = !enabled;
+        });
+      };
+
+      const setSource = (value) => {
+        options.forEach(option => {
+          const isActive = option.dataset.value === value;
+          option.classList.toggle('active', isActive);
+        });
+        if (onlinePanel) {
+          const showOnline = value === 'online';
+          onlinePanel.classList.toggle('show', showOnline);
+          onlinePanel.classList.toggle('hidden', !showOnline);
+          togglePanelFields(onlinePanel, showOnline);
+        }
+        if (walkinPanel) {
+          const showWalkin = value === 'walk-in';
+          walkinPanel.classList.toggle('show', showWalkin);
+          walkinPanel.classList.toggle('hidden', !showWalkin);
+          togglePanelFields(walkinPanel, showWalkin);
+        }
+        document.querySelectorAll('.system-type-field').forEach(field => {
+          field.style.display = value === 'online' ? 'block' : 'none';
+        });
+      };
+
+      options.forEach(option => {
+        option.addEventListener('click', () => {
+          const value = option.dataset.value;
+          radioInputs.forEach(input => { if (input.value === value) input.checked = true; });
+          setSource(value);
+        });
+      });
+
+      setSource('online');
+
+      addBidModal.addEventListener('hidden.bs.modal', () => {
+        setSource('online');
+        const form = addBidModal.querySelector('form');
+        if (form) form.reset();
+      });
+    }
+  });
+</script>
+
 <style>
-  * {
-    margin: 0;
-    padding: 0;
+  .bid-monitoring-container,
+  .bid-monitoring-container * {
     box-sizing: border-box;
   }
 
   .bid-monitoring-container {
-    max-width: 100%;
+    width: 100%;
+    max-width: 1480px;
     margin: 0 auto;
-    padding: 20px 16px;
+    padding: 16px 18px;
+    overflow: visible;
     background: linear-gradient(135deg, #f5f7fa 0%, #f9fbfd 100%);
     min-height: 100vh;
+  }
+
+  .full-bleed {
+    width: 100%;
+    display: grid;
+    gap: 16px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .full-bleed > .filter-section,
+  .full-bleed > .table-wrapper {
+    width: 100%;
+    margin: 0;
   }
 
   /* Header */
@@ -229,7 +602,7 @@
   }
 
   .bid-title {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 4px;
@@ -238,7 +611,7 @@
   }
 
   .bid-subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: #64748b;
     font-weight: 500;
     text-align: left;
@@ -274,8 +647,8 @@
   /* Filter Section */
   .filter-section {
     background: white;
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 10px;
+    padding: 12px;
     margin-bottom: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid #e2e8f0;
@@ -291,12 +664,14 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: space-between;
   }
 
   .search-input-container {
-    flex: 1;
-    min-width: 180px;
+    flex: 1 1 420px;
+    min-width: 220px;
+    min-width: 0;
     position: relative;
     display: flex;
     align-items: center;
@@ -313,12 +688,12 @@
 
   .search-input {
     width: 100%;
-    padding: 10px 10px 10px 36px;
-    border: 2px solid #e2e8f0;
+    padding: 8px 10px 8px 34px;
+    border: 1px solid #e8eef6;
     border-radius: 6px;
     font-size: 13px;
     color: #0f172a;
-    transition: all 0.3s ease;
+    transition: all 0.18s ease;
     font-family: inherit;
   }
 
@@ -330,8 +705,14 @@
 
   .filter-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 10px;
+  }
+
+  @media (max-width: 1120px) {
+    .filter-grid {
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
   }
 
   .filter-group {
@@ -341,7 +722,7 @@
   }
 
   .filter-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: #0f172a;
     text-transform: uppercase;
@@ -350,9 +731,9 @@
   }
 
   .filter-select {
-    padding: 8px 10px;
-    border: 2px solid #e2e8f0;
-    border-radius: 4px;
+    padding: 7px 10px;
+    border: 1px solid #e9f0f7;
+    border-radius: 5px;
     font-size: 12px;
     color: #0f172a;
     background-color: white;
@@ -380,7 +761,7 @@
 
   .btn-apply,
   .btn-clear {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
@@ -414,11 +795,361 @@
     border-color: #cbd5e1;
   }
 
-  /* Table */
+  .report-actions {
+    margin: 12px 0 0 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .modal-panel {
+    padding: 20px 28px 0;
+  }
+
+  .form-section-description {
+    font-size: 0.94rem;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .form-grid.full {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+  }
+
+  .form-control,
+  .form-select {
+    padding: 0.75rem 0.875rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-group-text {
+    padding: 0.75rem 0.875rem;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-right: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .input-group .form-control {
+    border-radius: 0 0.5rem 0.5rem 0;
+    border-left: none;
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  .form-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.375rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  }
+
+  .btn-secondary {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e5e7eb;
+  }
+
+  .btn-secondary:hover {
+    background: #e2e8f0;
+  }
+
+  .add-bid-modal .modal-content {
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .add-bid-modal .modal-header {
+    padding: 24px 28px;
+  }
+
+  .add-bid-modal .modal-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  .add-bid-modal .modal-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .add-bid-modal .modal-body {
+    padding: 0;
+    background: #f8fafc;
+  }
+
+  .add-bid-modal .modal-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .rfq-type-selector {
+    display: flex;
+    gap: 14px;
+    padding: 20px 0 20px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+  }
+
+  .rfq-option {
+    flex: 1;
+    padding: 18px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-height: 106px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .rfq-option strong {
+    display: block;
+    font-size: 1rem;
+    color: #0f172a;
+  }
+
+  .rfq-option span {
+    display: block;
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .rfq-option.active {
+    border-color: #2563eb;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+    background: #eff6ff;
+  }
+
+  .panel-section {
+    padding: 20px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .panel-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 16px;
+  }
+
+  .panel-section .form-section-description {
+    font-size: 0.94rem;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .panel-section.show {
+    display: block;
+  }
+
+  .panel-section.hidden {
+    display: none;
+  }
+
+  .modal-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.88);
+  }
+
+  .modal-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .btn-clear {
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-clear:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+  }
+
+  .summary-modal .modal-dialog {
+    max-width: 820px;
+    width: min(92vw, 820px);
+    margin: 1rem auto;
+  }
+
+  .summary-modal .modal-content {
+    min-height: 70vh;
+    max-height: 82vh;
+    border: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+  }
+
+  .summary-modal {
+    z-index: 11000;
+  }
+
+  .summary-modal .modal-body {
+    height: calc(82vh - 58px);
+    transition: height 0.2s ease;
+    background: #f8fafc;
+    padding: 0;
+  }
+
+  .summary-modal .modal-dialog.summary-minimized {
+    width: 420px;
+    max-width: 90vw;
+    transform: translateY(0);
+  }
+
+  .summary-modal .modal-dialog.summary-minimized .modal-content {
+    min-height: 0;
+    max-height: 64px;
+  }
+
+  .summary-modal .modal-dialog.summary-minimized .modal-body {
+    display: none;
+  }
+
+  .summary-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    color: white;
+  }
+
+  .summary-modal-subtitle {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .summary-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-minimize-btn,
+  .summary-close-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    line-height: 1;
+    border-radius: 8px;
+    border: 0;
+    color: white;
+  }
+
+  .summary-minimize-btn {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .summary-close-btn {
+    background: #dc2626;
+  }
+
+  .summary-modal iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: white;
+  }
+
   .table-wrapper {
     background: white;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid #e2e8f0;
     margin-bottom: 16px;
@@ -429,7 +1160,8 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
-    table-layout: fixed;
+    table-layout: auto;
+    min-width: 100%;
   }
 
   .bids-table thead {
@@ -438,40 +1170,46 @@
   }
 
   .bids-table th {
-    padding: 10px 8px;
+    padding: 8px 6px;
     text-align: left;
     font-weight: 600;
     color: #0f172a;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .bids-table td {
-    padding: 10px 8px;
+    padding: 8px 6px;
     color: #475569;
     border-bottom: 1px solid #f1f5f9;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
   }
 
   /* Column-specific alignment */
-  .col-ref, .ref-cell { text-align: left; width: 70px; }
-  .col-date, .date-cell { text-align: center; width: 75px; }
-  .col-title, .title-cell { text-align: left; width: 140px; }
-  .col-entity, .entity-cell { text-align: left; width: 80px; }
-  .col-system, .system-cell { text-align: center; width: 70px; }
-  .col-category, .category-cell { text-align: left; width: 70px; }
-  .col-region, .region-cell { text-align: left; width: 60px; }
-  .col-abc, .currency-cell { text-align: right; width: 85px; }
-  .col-closing, .closing-cell { text-align: center; width: 75px; }
-  .col-status, .status-cell { text-align: center; width: 70px; }
-  .col-canvassing, .canvassing-cell { text-align: center; width: 70px; }
-  .col-priority, .priority-cell { text-align: center; width: 65px; }
+  .col-ref, .ref-cell { text-align: left; width: 80px; }
+  .col-date, .date-cell { text-align: center; width: 90px; }
+  .col-title, .title-cell { text-align: left; width: 260px; }
+  .col-entity, .entity-cell { text-align: left; width: 220px; }
+  .col-system, .system-cell { text-align: center; width: 100px; }
+  .col-source, .source-cell { text-align: center; width: 105px; }
+  .col-category, .category-cell { text-align: left; width: 150px; }
+  .col-region, .region-cell { text-align: left; width: 95px; }
+  .col-abc, .currency-cell { text-align: right; width: 120px; }
+  .col-closing, .closing-cell { text-align: center; width: 120px; }
+  .col-status, .status-cell { text-align: center; width: 110px; }
+  .col-canvassing, .canvassing-cell { text-align: center; width: 110px; }
+  .col-priority, .priority-cell { text-align: center; width: 95px; }
+
+  .bids-table th,
+  .bids-table td {
+    min-width: 0;
+  }
 
   .ref-cell {
     font-weight: 600;

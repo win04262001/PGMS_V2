@@ -7,24 +7,158 @@
     box-sizing: border-box;
   }
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
+  body {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f3f6fb;
+    color: #1f2937;
   }
 
-  /* Header Section */
+  .container {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+  }
+
+  .container.pdf-mode {
+    max-width: 100%;
+    padding: 18px 18px 22px;
+    background: white;
+  }
+
+  .container.pdf-mode .report-header {
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    margin-bottom: 12px;
+  }
+
+  .container.pdf-mode .report-header-left {
+    gap: 12px;
+  }
+
+  .container.pdf-mode .report-title {
+    font-size: 24px;
+  }
+
+  .container.pdf-mode .report-sub {
+    font-size: 13px;
+    color: #475569;
+  }
+
+  .container.pdf-mode .report-header-actions,
+  .container.pdf-mode .filter-form,
+  .container.pdf-mode .report-summary {
+    display: none;
+  }
+
+  .container.pdf-mode .summary-card {
+    grid-template-columns: 1fr;
+    border: 1px solid #d1d5db;
+    box-shadow: none;
+    background: #f9fafb;
+    margin-bottom: 18px;
+    page-break-inside: avoid;
+  }
+
+  .container.pdf-mode .summary-main {
+    padding: 18px 18px 18px 22px;
+  }
+
+  .container.pdf-mode .summary-side {
+    width: 100%;
+    min-height: auto;
+    padding: 16px 18px 18px;
+    background: transparent;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .container.pdf-mode .status-box {
+    width: 100%;
+    font-size: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+
+  .container.pdf-mode .status-chip {
+    width: 100%;
+    border: none;
+    background: #e2e8f0;
+    color: #334155;
+    padding: 10px 14px;
+    margin-top: 0;
+  }
+
+  .container.pdf-mode .summary-row {
+    grid-template-columns: 150px 1fr;
+    padding: 10px 0;
+  }
+
+  .container.pdf-mode .label {
+    width: 150px;
+    font-size: 12px;
+  }
+
+  .container.pdf-mode .value {
+    font-size: 14px;
+  }
+
+  .container.pdf-mode .summary-card-header {
+    margin-bottom: 14px;
+  }
+
+  .container.pdf-mode .summary-card-title {
+    font-size: 17px;
+  }
+
+  .container.modal-view {
+    max-width: 100%;
+    padding: 12px 12px 18px;
+    background: transparent;
+  }
+
+  .container.modal-view .summary-card {
+    margin-bottom: 12px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  }
+
+  .container.modal-view .summary-main {
+    padding: 18px 20px;
+  }
+
+  .container.modal-view .summary-side {
+    min-height: auto;
+    padding: 16px 18px;
+  }
+
+  .container.modal-view .summary-row {
+    padding: 8px 0;
+  }
+
+  .container.modal-view .empty-state {
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+
+  .container.pdf-mode .summary-card-reference {
+    font-size: 12px;
+    color: #475569;
+  }
+
   .report-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 32px;
+    gap: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    padding: 24px 24px 20px;
+    border-radius: 18px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+    margin-bottom: 16px;
     flex-wrap: wrap;
+    border: 1px solid #e2e8f0;
   }
 
   .report-header-left {
@@ -35,26 +169,28 @@
   }
 
   .report-header-left img {
-    height: 56px;
+    height: 64px;
     width: auto;
-    border-radius: 8px;
+    border-radius: 12px;
+    object-fit: contain;
   }
 
   .report-header-content {
     display: flex;
     flex-direction: column;
+    gap: 6px;
   }
 
   .report-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a202c;
-    margin-bottom: 4px;
+    font-size: 30px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.02em;
   }
 
   .report-sub {
     font-size: 14px;
-    color: #718096;
+    color: #475569;
   }
 
   .report-header-actions {
@@ -64,65 +200,100 @@
     justify-content: flex-end;
   }
 
-  /* Buttons */
   .btn {
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 11px 18px;
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     border: none;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: white;
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.16);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+    transform: translateY(-1px);
   }
 
-  .btn-outline-secondary {
+  .btn-outline-secondary,
+  .btn-outline-primary {
     background: white;
-    color: #2d3748;
-    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    color: #334155;
   }
 
-  .btn-outline-secondary:hover {
-    background: #f0f4f8;
-    border-color: #cbd5e0;
+  .btn-outline-secondary:hover,
+  .btn-outline-primary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
   }
 
   .btn-outline-primary {
+    color: #4338ca;
+  }
+
+  .report-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
     background: white;
-    color: #667eea;
-    border: 1px solid #667eea;
+    padding: 16px 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
   }
 
-  .btn-outline-primary:hover {
-    background: #f0f4f8;
+  .summary-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
   }
 
-  /* Filter Section */
+  .summary-note {
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .summary-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
   .filter-form {
     background: white;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 32px;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
   }
 
   .row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
     align-items: flex-end;
   }
 
@@ -133,70 +304,90 @@
 
   .row > div[style*="align-self:end"] {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: flex-end;
   }
 
   .form-label {
     font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #4a5568;
+    font-weight: 700;
+    margin-bottom: 9px;
+    color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
   }
 
   .row input,
   .row select {
-    padding: 10px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
     font-size: 14px;
     font-family: inherit;
+    background: #f8fafc;
     transition: all 0.2s ease;
   }
 
   .row input:focus,
   .row select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    background: white;
   }
 
   .g-2 {
     margin-bottom: 0;
   }
 
-  /* Cards */
   .summary-card {
     display: grid;
-    grid-template-columns: 1fr 200px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    border-radius: 18px;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e2e8f0;
   }
 
   .summary-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
+    box-shadow: 0 22px 64px rgba(15, 23, 42, 0.12);
   }
 
   .summary-main {
-    flex: 1;
-    padding: 24px;
-    background: white;
+    padding: 22px 24px;
+  }
+
+  .summary-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .summary-card-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+
+  .summary-card-reference {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
   }
 
   .summary-row {
     display: grid;
-    grid-template-columns: 160px 1fr;
+    grid-template-columns: 140px minmax(0, 1fr);
     gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid #edf2f7;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
   }
 
   .summary-row:last-child {
@@ -206,107 +397,183 @@
   .label {
     width: 160px;
     font-weight: 700;
-    color: #718096;
+    color: #64748b;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
   }
 
   .value {
-    color: #1a202c;
+    color: #0f172a;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
+    line-height: 1.6;
   }
 
   .value.currency {
-    color: #48bb78;
+    color: #16a34a;
     font-weight: 700;
     font-size: 16px;
   }
 
   .summary-side {
-    width: 200px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    width: 240px;
+    background: linear-gradient(180deg, #f8faff 0%, #eef6ff 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 250px;
+    min-height: 220px;
+    padding: 20px;
+    border-left: 1px solid #e2e8f0;
+  }
+
+  .status-panel {
+    text-align: center;
+    width: 100%;
   }
 
   .status-box {
-    text-align: center;
-    padding: 16px 20px;
-    font-weight: 700;
-    color: white;
-    border-radius: 8px;
+    display: inline-flex;
+    width: auto;
+    min-width: 80px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 16px;
+    font-weight: 800;
+    color: #1e293b;
+    border-radius: 999px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 14px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    margin-bottom: 16px;
+    background: #eef2ff;
+    border: 1px solid #cbd5e1;
+  }
+
+  .status-box.new {
+    background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+    color: #ffffff;
+    border-color: transparent;
   }
 
   .status-box.open {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #475569 100%);
+    color: #ffffff;
+    border-color: transparent;
   }
 
   .status-box.pending {
-    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    color: #ffffff;
+    border-color: transparent;
   }
 
   .status-box.awarded {
-    background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+    color: #ffffff;
+    border-color: transparent;
   }
 
   .status-box.closed {
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+    color: #ffffff;
+    border-color: transparent;
   }
 
-  /* Empty State */
+  .status-chip {
+    display: inline-flex;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #334155;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+  }
+
+  .status-box.open {
+    background: linear-gradient(135deg, #4338ca 0%, #8b5cf6 100%);
+  }
+
+  .status-box.pending {
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  }
+
+  .status-box.awarded {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  }
+
+  .status-box.closed {
+    background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  }
+
   .empty-state {
     background: white;
-    padding: 60px 24px;
+    padding: 48px 24px;
     text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    color: #718096;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    color: #64748b;
     font-size: 16px;
+    border: 1px solid #e2e8f0;
   }
 
-  /* Print Styles */
   @media print {
+    body {
+      background: white;
+      color: #111827;
+    }
+
     .no-print {
-      display: none;
+      display: none !important;
     }
 
     .container {
       padding: 0;
+      width: auto;
     }
 
-    .report-header {
+    .report-header,
+    .report-summary,
+    .filter-form,
+    .summary-card {
       box-shadow: none;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .filter-form {
-      display: none;
+      border: none;
+      background: transparent;
     }
 
     .summary-card {
       page-break-inside: avoid;
-      box-shadow: none;
+      break-inside: avoid;
+    }
+
+    .summary-card:not(:first-child) {
+      margin-top: 18px;
+    }
+
+    .summary-side {
+      min-height: auto;
+      padding: 18px 0 0;
+      border: none;
+      background: transparent;
     }
   }
 
-  /* Responsive */
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .report-header {
       flex-direction: column;
       align-items: flex-start;
-      padding: 20px;
+      padding: 22px;
     }
 
     .report-header-actions {
       width: 100%;
+      justify-content: flex-start;
+    }
+
+    .report-summary {
+      flex-direction: column;
+      align-items: stretch;
     }
 
     .summary-card {
@@ -314,17 +581,19 @@
     }
 
     .summary-side {
-      border-top: 1px solid #edf2f7;
+      width: 100%;
+      border-left: 0;
+      border-top: 1px solid #e2e8f0;
       min-height: auto;
-      padding: 16px;
+      padding: 20px;
     }
 
     .summary-row {
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 130px 1fr;
     }
 
     .report-title {
-      font-size: 24px;
+      font-size: 26px;
     }
 
     .row {
@@ -333,11 +602,13 @@
 
     .row > div[style*="align-self:end"] {
       flex-direction: row;
+      flex-wrap: wrap;
     }
   }
 </style>
 
-<div class="container">
+<div class="container{% if pdf %} pdf-mode{% endif %}{% if request.args.get('modal') == '1' %} modal-view{% endif %}">
+  {% if not pdf %}
   <div class="report-header">
     <div class="report-header-left">
       <img src="/static/philgeps.png" alt="logo"/>
@@ -346,11 +617,24 @@
         <div class="report-sub">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M') if generated_at else '' }}</div>
       </div>
     </div>
+    {% if not pdf %}
     <div class="report-header-actions no-print">
       <a href="{{ url_for('reports_summary_csv') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download CSV</a>
       <a href="{{ url_for('reports_summary_xlsx') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download Excel</a>
       <a href="{{ url_for('reports_summary_pdf') }}?{{ request.query_string.decode('utf-8') }}" class="btn btn-outline-secondary">Download PDF</a>
       <button class="btn btn-primary" onclick="window.print()">Print</button>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if not pdf and request.args.get('modal') != '1' %}
+  <div class="report-summary no-print">
+    <div class="summary-meta">
+      <div class="summary-note">Showing {{ bids|length }} {{ 'bid' if bids|length == 1 else 'bids' }} in summary</div>
+      {% if filters %}
+      <div class="summary-badge">Filters applied</div>
+      {% endif %}
     </div>
   </div>
 
@@ -397,6 +681,7 @@
       </div>
     </form>
   </div>
+  {% endif %}
 
   {% if not bids %}
   <div class="empty-state">No bids matched the selected filters.</div>
@@ -404,15 +689,25 @@
   {% for bid in bids %}
   <div class="summary-card">
     <div class="summary-main">
+      <div class="summary-card-header">
+        <div>
+          <div class="summary-card-title">{{ bid.project_title or 'Untitled Bid' }}</div>
+          <div class="summary-card-reference">Ref: {{ bid.reference_number or '-' }} · {{ bid.system_type or '-' }} · {{ bid.category or '-' }}</div>
+        </div>
+        <span class="status-chip">{{ bid.priority_level or 'Normal' }}</span>
+      </div>
       <div class="summary-row"><span class="label">Agency</span><span class="value">{{ bid.procuring_entity or '-' }}</span></div>
       <div class="summary-row"><span class="label">ABC</span><span class="value currency">{{ bid.abc_value | format_currency }}</span></div>
-      <div class="summary-row"><span class="label">Type of Procurement</span><span class="value">{{ bid.procurement_mode or '-' }}</span></div>
-      <div class="summary-row"><span class="label">Address</span><span class="value">{{ bid.delivery_location or '-' }}</span></div>
-      <div class="summary-row"><span class="label">Deadline</span><span class="value">{{ bid.closing_date | format_date }}{% if bid.closing_time %} | {{ bid.closing_time | format_time }}{% endif %}</span></div>
-      <div class="summary-row"><span class="label">Project Title</span><span class="value">{{ bid.project_title or '-' }}</span></div>
+      <div class="summary-row"><span class="label">Type</span><span class="value">{{ bid.procurement_mode or '-' }}</span></div>
+      <div class="summary-row"><span class="label">Location</span><span class="value">{{ bid.delivery_location or '-' }}</span></div>
+      <div class="summary-row"><span class="label">Deadline</span><span class="value">{{ bid.closing_date | format_date }}{% if bid.closing_time %} · {{ bid.closing_time | format_time }}{% endif %}</span></div>
+      <div class="summary-row"><span class="label">Status</span><span class="value">{{ bid.status or '-' }}</span></div>
     </div>
     <div class="summary-side">
-      <div class="status-box {% if bid.status %}{{ bid.status | lower }}{% endif %}">{{ bid.status or '-' }}</div>
+      <div class="status-panel">
+        <div class="status-box {% if bid.status %}{{ bid.status | lower }}{% endif %}">{{ bid.status or '-' }}</div>
+        <div class="status-chip">Deadline: {{ bid.closing_date | format_date }}</div>
+      </div>
     </div>
   </div>
   {% endfor %}

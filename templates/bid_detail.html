@@ -104,58 +104,104 @@
     padding: 2rem;
   }
 
+  .card-body {
+    display: grid;
+    gap: 2rem;
+  }
+
   .field-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.75rem;
+  }
+
+  .section {
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .section-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    line-height: 1.6;
   }
 
   .field {
     display: flex;
     flex-direction: column;
+    gap: 0.35rem;
   }
 
   .field-label {
     font-weight: 600;
-    color: #4a5568;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
+    color: #475569;
+    font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.08em;
   }
 
   .field-value {
-    font-size: 1rem;
-    color: #2c3e50;
-    line-height: 1.6;
+    font-size: 0.98rem;
+    color: #0f172a;
+    line-height: 1.7;
+    min-height: 1.7rem;
   }
 
   .field-value.currency {
     font-weight: 600;
-    color: #10b981;
-    font-size: 1.1rem;
+    color: #0f766e;
+    font-size: 1rem;
   }
 
-  .field-value.status {
-    display: inline-block;
-    background: #667eea;
-    color: white;
-    padding: 0.375rem 0.75rem;
+  .field-value.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
     border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
     width: fit-content;
+  }
+
+  .badge-online {
+    background: #2563eb;
+  }
+
+  .badge-walkin {
+    background: #f59e0b;
+  }
+
+  .badge-status {
+    background: #0f172a;
   }
 
   .field-full {
     grid-column: 1 / -1;
   }
 
-  .remarks-box, .attachments-box {
-    background: #f8fafb;
+  .remarks-box,
+  .attachments-box {
+    background: #f8fafc;
     padding: 1rem;
-    border-radius: 0.5rem;
-    border-left: 4px solid #667eea;
+    border-radius: 0.85rem;
+    border-left: 4px solid #2563eb;
+    color: #334155;
+    line-height: 1.7;
   }
 
   .attachments-list {
@@ -165,26 +211,54 @@
   }
 
   .attachments-list li {
-    padding: 0.5rem 0;
+    padding: 0.55rem 0;
   }
 
   .attachments-list a {
-    color: #667eea;
+    color: #2563eb;
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+    font-weight: 600;
+    transition: color 0.2s ease;
   }
 
   .attachments-list a:hover {
-    color: #764ba2;
+    color: #1d4ed8;
     text-decoration: underline;
   }
 
-  .divider {
+  .section-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .section-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-top: 0.35rem;
+  }
+
+  .section-divider {
     height: 1px;
     background: #e2e8f0;
     margin: 2rem 0;
-    grid-column: 1 / -1;
   }
 
   @media (max-width: 768px) {
@@ -234,144 +308,199 @@
     </div>
 
     <div class="card-body">
-      <div class="field-grid">
-        <!-- Basic Information -->
-        <div class="field">
-          <div class="field-label">System Type</div>
-          <div class="field-value">{{ bid.system_type or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Control Number</div>
-          <div class="field-value">{{ bid.control_number or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Procuring Entity</div>
-          <div class="field-value">{{ bid.procuring_entity or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Procurement Mode</div>
-          <div class="field-value">{{ bid.procurement_mode or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Region</div>
-          <div class="field-value">{{ bid.region or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Delivery / Project Location</div>
-          <div class="field-value">{{ bid.delivery_location or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Contact Person</div>
-          <div class="field-value">{{ bid.contact_person or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Date Created</div>
-          <div class="field-value">{{ bid.date_created | format_datetime }}</div>
-        </div>
-
-        <!-- Location Details -->
-        <div class="field">
-          <div class="field-label">Province</div>
-          <div class="field-value">{{ bid.province or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">ABC Value</div>
-          <div class="field-value currency">{{ bid.abc_value | format_currency }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Category</div>
-          <div class="field-value">{{ bid.category or '-' }}</div>
-        </div>
-
-        <!-- Timeline -->
-        <div class="divider"></div>
-        <div class="field">
-          <div class="field-label">Closing Date</div>
-          <div class="field-value">{{ bid.closing_date | format_date }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Closing Time</div>
-          <div class="field-value">{{ bid.closing_time | format_time }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Days Remaining</div>
-          <div class="field-value">{{ bid.days_remaining or '-' }}</div>
-        </div>
-
-        <!-- Status & Priority -->
-        <div class="divider"></div>
-        <div class="field">
-          <div class="field-label">Priority Level</div>
-          <div class="field-value status">{{ bid.priority_level or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Status</div>
-          <div class="field-value status">{{ bid.status or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Canvassing Status</div>
-          <div class="field-value status">{{ bid.canvassing_status or '-' }}</div>
-        </div>
-
-        <!-- Submission Details -->
-        <div class="divider"></div>
-        <div class="field">
-          <div class="field-label">Date Monitored</div>
-          <div class="field-value">{{ bid.date_monitored | format_date }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Date Submitted</div>
-          <div class="field-value">{{ bid.date_submitted | format_date }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Bid Amount</div>
-          <div class="field-value currency">{{ bid.bid_amount | format_currency }}</div>
-        </div>
-
-        <!-- Results -->
-        <div class="divider"></div>
-        <div class="field">
-          <div class="field-label">Result</div>
-          <div class="field-value">{{ bid.result or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">Opportunity Score</div>
-          <div class="field-value">{{ bid.opportunity_score or '-' }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">ABC Flag</div>
-          <div class="field-value">{{ bid.abc_flag or '-' }}</div>
-        </div>
-
-        <!-- Notes & Remarks -->
-        <div class="divider"></div>
-        <div class="field field-full">
-          <div class="field-label">Remarks</div>
-          <div class="remarks-box">
-            {{ bid.remarks or '-' }}
+      <div class="section section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Bid Overview</div>
+            <div class="section-subtitle">Key details about the RFQ, procurement channel, and budget.</div>
           </div>
         </div>
-        <div class="field field-full">
-          <div class="field-label">Recommendation</div>
-          <div class="remarks-box">
-            {{ bid.recommendation or '-' }}
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">RFQ Source</div>
+            <div class="field-value">
+              {% if bid.rfq_source == 'walk-in' %}
+              <span class="field-value badge badge-walkin">Walk-In</span>
+              {% else %}
+              <span class="field-value badge badge-online">Online</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">System Type</div>
+            <div class="field-value">{{ bid.system_type or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Control Number</div>
+            <div class="field-value">{{ bid.control_number or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Procuring Entity</div>
+            <div class="field-value">{{ bid.procuring_entity or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Procurement Mode</div>
+            <div class="field-value">{{ bid.procurement_mode or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Category</div>
+            <div class="field-value">{{ bid.category or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Region</div>
+            <div class="field-value">{{ bid.region or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Delivery / Project Location</div>
+            <div class="field-value">{{ bid.delivery_location or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">ABC Value</div>
+            <div class="field-value currency">{{ bid.abc_value | format_currency }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Date Created</div>
+            <div class="field-value">{{ bid.date_created | format_datetime }}</div>
           </div>
         </div>
+      </div>
 
-        <!-- Attachments -->
-        <div class="divider"></div>
-        <div class="field field-full">
-          <div class="field-label">Attachments</div>
-          <div class="attachments-box">
-            {% if bid.attachments %}
-            <ul class="attachments-list">
-              {% for filename in bid.attachments.split(';') %}
-              <li><a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">{{ filename }}</a></li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <span>No attachments</span>
-            {% endif %}
+      {% if bid.rfq_source == 'walk-in' %}
+      <div class="section section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Walk-In Supplier Details</div>
+            <div class="section-subtitle">Physical RFQ details and supplier contact information.</div>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">P.R. Number</div>
+            <div class="field-value">{{ bid.pr_number or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Office / Department</div>
+            <div class="field-value">{{ bid.office_department or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Supplier Name</div>
+            <div class="field-value">{{ bid.supplier_name or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Company Address</div>
+            <div class="field-value">{{ bid.company_address or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Contact Email</div>
+            <div class="field-value">{{ bid.contact_email or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Contact Phone</div>
+            <div class="field-value">{{ bid.contact_phone or '-' }}</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="section section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Timeline & Status</div>
+            <div class="section-subtitle">Closing dates, current status, and follow-up progress.</div>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Closing Date</div>
+            <div class="field-value">{{ bid.closing_date | format_date }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Closing Time</div>
+            <div class="field-value">{{ bid.closing_time | format_time }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Days Remaining</div>
+            <div class="field-value">{{ bid.days_remaining or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Priority Level</div>
+            <div class="field-value badge badge-status">{{ bid.priority_level or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Status</div>
+            <div class="field-value badge badge-status">{{ bid.status or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Canvassing Status</div>
+            <div class="field-value badge badge-status">{{ bid.canvassing_status or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Date Monitored</div>
+            <div class="field-value">{{ bid.date_monitored | format_date }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Date Submitted</div>
+            <div class="field-value">{{ bid.date_submitted | format_date }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Financial & Outcome</div>
+            <div class="section-subtitle">Budget, results, scoring, and ABC status.</div>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Bid Amount</div>
+            <div class="field-value currency">{{ bid.bid_amount | format_currency }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Result</div>
+            <div class="field-value">{{ bid.result or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Opportunity Score</div>
+            <div class="field-value">{{ bid.opportunity_score or '-' }}</div>
+          </div>
+          <div class="field">
+            <div class="field-label">ABC Flag</div>
+            <div class="field-value">{{ bid.abc_flag or '-' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Remarks & Attachments</div>
+            <div class="section-subtitle">Important notes and files for this bid.</div>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field field-full">
+            <div class="field-label">Remarks</div>
+            <div class="remarks-box">{{ bid.remarks or '-' }}</div>
+          </div>
+          <div class="field field-full">
+            <div class="field-label">Recommendation</div>
+            <div class="remarks-box">{{ bid.recommendation or '-' }}</div>
+          </div>
+          <div class="field field-full">
+            <div class="field-label">Attachments</div>
+            <div class="attachments-box">
+              {% if bid.attachments %}
+              <ul class="attachments-list">
+                {% for filename in bid.attachments.split(';') %}
+                <li><a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">{{ filename }}</a></li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              <span>No attachments</span>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>

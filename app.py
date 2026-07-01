@@ -6,6 +6,7 @@ from functools import wraps
 import mimetypes
 import io
 import csv
+import shutil
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 try:
@@ -18,11 +19,16 @@ try:
     _WEASY_AVAILABLE = True
 except Exception:
     _WEASY_AVAILABLE = False
+try:
+    from fpdf import FPDF
+    _FPDF_AVAILABLE = True
+except Exception:
+    _FPDF_AVAILABLE = False
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from sqlalchemy import inspect, or_, text
-from models import db, Bid, RequirementDocument, PreDocument, LoginLog
+from models import db, Bid, RequirementDocument, PreDocument, LoginLog, BidAttachment
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / 'app.db'
@@ -93,6 +99,90 @@ def create_app():
         combined = list(PHILGEPS_CATEGORIES) + [value for value in existing_values if value]
         return sorted(dict.fromkeys(combined), key=lambda x: x.lower())
 
+    def safe_pdf_text(value):
+        if value is None:
+            return ''
+        text = str(value)
+        text = text.replace('₱', 'PHP ')
+        text = text.replace('–', '-').replace('—', '-')
+        return text.encode('latin-1', 'replace').decode('latin-1')
+
+    def render_summary_pdf_fpdf(bids):
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+        pdf.set_font('Helvetica', 'B', 16)
+        pdf.cell(0, 10, safe_pdf_text('Daily Bid Summary'), align='C', new_x='LMARGIN', new_y='NEXT')
+        pdf.ln(2)
+        pdf.set_font('Helvetica', '', 10)
+        pdf.cell(0, 6, safe_pdf_text(f'Generated: {datetime.datetime.utcnow():%Y-%m-%d %H:%M}'), new_x='LMARGIN', new_y='NEXT')
+        pdf.ln(10)
+
+        width = pdf.w - pdf.l_margin - pdf.r_margin
+        label_width = 28
+
+        for bid in bids:
+            start_y = pdf.get_y()
+            pdf.set_font('Helvetica', 'B', 13)
+            pdf.multi_cell(width, 6, safe_pdf_text(bid.project_title or 'Untitled Bid'))
+            pdf.ln(1)
+
+            pdf.set_font('Helvetica', '', 10)
+            pdf.multi_cell(width, 5, safe_pdf_text(f'Reference: {bid.reference_number or "-"}'))
+            pdf.cell(width * 0.5, 5, safe_pdf_text(f'Entity: {bid.procuring_entity or "-"}'), ln=0)
+            pdf.cell(0, 5, safe_pdf_text(f'System: {bid.system_type or "-"}'), ln=1)
+            pdf.multi_cell(width, 5, safe_pdf_text(f'Category: {bid.category or "-"} | Region: {bid.region or "-"}'))
+            pdf.ln(4)
+
+            pdf.set_draw_color(225, 227, 235)
+            pdf.set_line_width(0.3)
+            current_y = pdf.get_y()
+            pdf.line(pdf.l_margin, current_y, pdf.l_margin + width, current_y)
+            pdf.ln(6)
+
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.cell(label_width, 5, safe_pdf_text('ABC:'), ln=0)
+            pdf.set_font('Helvetica', '', 10)
+            pdf.cell(0, 5, safe_pdf_text(f'PHP {bid.abc_value:,.2f}' if bid.abc_value is not None else '-'), ln=1)
+
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.cell(label_width, 5, safe_pdf_text('Type:'), ln=0)
+            pdf.set_font('Helvetica', '', 10)
+            pdf.cell(0, 5, safe_pdf_text(bid.procurement_mode or '-'), ln=1)
+
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.cell(label_width, 5, safe_pdf_text('Location:'), ln=0)
+            pdf.set_font('Helvetica', '', 10)
+            pdf.cell(0, 5, safe_pdf_text(bid.delivery_location or '-'), ln=1)
+
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.cell(label_width, 5, safe_pdf_text('Deadline:'), ln=0)
+            pdf.set_font('Helvetica', '', 10)
+            pdf.cell(0, 5, safe_pdf_text(f'{bid.closing_date.strftime("%Y-%m-%d") if bid.closing_date else "-"}{" " + bid.closing_time if bid.closing_time else ""}'), ln=1)
+
+            pdf.set_font('Helvetica', 'B', 10)
+            pdf.cell(label_width, 5, safe_pdf_text('Status:'), ln=0)
+            status_text = bid.status or '-'
+            normalized_status = status_text.strip().lower()
+            if normalized_status == 'new':
+                pdf.set_text_color(22, 101, 52)
+            elif normalized_status in ('pending', 'open'):
+                pdf.set_text_color(234, 88, 12)
+            elif normalized_status in ('awarded', 'closed', 'completed'):
+                pdf.set_text_color(220, 38, 38)
+            else:
+                pdf.set_text_color(51, 65, 85)
+            pdf.set_font('Helvetica', '', 10)
+            pdf.cell(0, 5, safe_pdf_text(status_text), ln=1)
+            pdf.set_text_color(0, 0, 0)
+
+            end_y = pdf.get_y()
+            pdf.set_draw_color(225, 227, 235)
+            pdf.set_line_width(0.6)
+            pdf.rect(pdf.l_margin - 1, start_y - 1, width + 2, end_y - start_y + 2)
+            pdf.ln(10)
+        return bytes(pdf.output(dest='S'))
+
     def login_required(view):
         @wraps(view)
         def wrapped_view(**kwargs):
@@ -105,6 +195,7 @@ def create_app():
         return {
             'date_monitored': bid.date_monitored.strftime('%Y-%m-%d') if bid.date_monitored else '',
             'reference_number': bid.reference_number or '',
+            'rfq_source': bid.rfq_source or 'online',
             'system_type': bid.system_type or 'Philgeps',
             'control_number': bid.control_number or '',
             'procuring_entity': bid.procuring_entity or '',
@@ -130,6 +221,12 @@ def create_app():
             'opportunity_score': bid.opportunity_score if bid.opportunity_score is not None else '',
             'abc_flag': bid.abc_flag or '',
             'recommendation': bid.recommendation or '',
+            'pr_number': bid.pr_number or '',
+            'office_department': bid.office_department or '',
+            'supplier_name': bid.supplier_name or '',
+            'company_address': bid.company_address or '',
+            'contact_email': bid.contact_email or '',
+            'contact_phone': bid.contact_phone or '',
             'attachments': bid.attachments or '',
         }
 
@@ -349,6 +446,7 @@ def create_app():
                 bid = Bid(
                     date_monitored=parse_date_input(form_data.get('date_monitored')),
                     reference_number=reference_number,
+                    rfq_source=form_data.get('rfq_source', 'online').strip() or 'online',
                     system_type=form_data.get('system_type', '').strip() or 'Philgeps',
                     control_number=form_data.get('control_number', '').strip() or None,
                     procuring_entity=form_data.get('procuring_entity', '').strip() or None,
@@ -374,6 +472,12 @@ def create_app():
                     opportunity_score=int(form_data.get('opportunity_score')) if form_data.get('opportunity_score') else None,
                     abc_flag=form_data.get('abc_flag', '').strip() or None,
                     recommendation=form_data.get('recommendation', '').strip() or None,
+                    pr_number=form_data.get('pr_number', '').strip() or None,
+                    office_department=form_data.get('office_department', '').strip() or None,
+                    supplier_name=form_data.get('supplier_name', '').strip() or None,
+                    company_address=form_data.get('company_address', '').strip() or None,
+                    contact_email=form_data.get('contact_email', '').strip() or None,
+                    contact_phone=form_data.get('contact_phone', '').strip() or None,
                     attachments=';'.join(saved_files) if saved_files else None,
                 )
                 db.session.add(bid)
@@ -430,6 +534,7 @@ def create_app():
 
                     bid.date_monitored = parse_date_input(form_data.get('date_monitored'))
                     bid.reference_number = reference_number
+                    bid.rfq_source = form_data.get('rfq_source', 'online').strip() or 'online'
                     bid.system_type = form_data.get('system_type', '').strip() or 'Philgeps'
                     bid.control_number = form_data.get('control_number', '').strip() or None
                     bid.procuring_entity = form_data.get('procuring_entity', '').strip() or None
@@ -455,6 +560,12 @@ def create_app():
                     bid.abc_flag = form_data.get('abc_flag', '').strip() or None
                     bid.recommendation = form_data.get('recommendation', '').strip() or None
                     bid.canvassing_status = form_data.get('canvassing_status', '').strip() or None
+                    bid.pr_number = form_data.get('pr_number', '').strip() or None
+                    bid.office_department = form_data.get('office_department', '').strip() or None
+                    bid.supplier_name = form_data.get('supplier_name', '').strip() or None
+                    bid.company_address = form_data.get('company_address', '').strip() or None
+                    bid.contact_email = form_data.get('contact_email', '').strip() or None
+                    bid.contact_phone = form_data.get('contact_phone', '').strip() or None
                     if saved_files:
                         existing = bid.attachments.split(';') if bid.attachments else []
                         bid.attachments = ';'.join(existing + saved_files)
@@ -607,6 +718,19 @@ def create_app():
         doc = PreDocument.query.filter_by(filename=filename).first()
         if doc:
             return render_template('pre_document_preview.html', doc=doc)
+        return redirect(url_for('pre_documents_list'))
+
+    @app.route('/pre-documents/<int:doc_id>/delete', methods=['POST'])
+    @login_required
+    def pre_document_delete(doc_id):
+        doc = PreDocument.query.get_or_404(doc_id)
+        filename = doc.filename
+        db.session.delete(doc)
+        db.session.commit()
+        file_path = UPLOAD_FOLDER / filename
+        if file_path.exists():
+            file_path.unlink()
+        flash('Pre-document deleted successfully.', 'success')
         return redirect(url_for('pre_documents_list'))
 
     def build_bid_query_from_args(args):
@@ -764,31 +888,25 @@ def create_app():
     def reports_summary_pdf():
         query = build_bid_query_from_args(request.args)
         bids = query.order_by(Bid.date_monitored.desc().nullslast(), Bid.closing_date.asc().nullslast()).all()
-        html = render_template('summary_report.html', bids=bids, filters=request.args, pdf=True, generated_at=datetime.datetime.utcnow())
-        # Try pdfkit (wkhtmltopdf), then WeasyPrint, otherwise show printable view with instructions
+        html = render_template('summary_report_pdf.html', bids=bids, filters=request.args, generated_at=datetime.datetime.utcnow())
+        # Try pdfkit (wkhtmltopdf), then WeasyPrint, then FPDF fallback
         if _PDFKIT_AVAILABLE:
-            try:
-                # Allow overriding wkhtmltopdf path via environment variable
-                wkpath = os.environ.get('WKHTMLTOPDF_PATH') or app.config.get('WKHTMLTOPDF_PATH')
-                pdf_conf = None
+            wkpath = os.environ.get('WKHTMLTOPDF_PATH') or app.config.get('WKHTMLTOPDF_PATH')
+            if not wkpath:
+                wkpath = shutil.which('wkhtmltopdf')
+            if wkpath:
                 try:
-                    if wkpath:
-                        pdf_conf = pdfkit.configuration(wkhtmltopdf=wkpath)
-                    else:
-                        pdf_conf = None
-                except Exception:
-                    pdf_conf = None
-                if pdf_conf:
+                    pdf_conf = pdfkit.configuration(wkhtmltopdf=wkpath)
                     pdf = pdfkit.from_string(html, False, configuration=pdf_conf)
-                else:
-                    pdf = pdfkit.from_string(html, False)
-                filename = f"summary_{datetime.date.today().isoformat()}.pdf"
-                return (pdf, 200, {
-                    'Content-Type': 'application/pdf',
-                    'Content-Disposition': f'attachment; filename="{filename}"'
-                })
-            except Exception:
-                flash('PDF generation via pdfkit failed on the server. Trying alternative...', 'warning')
+                    filename = f"summary_{datetime.date.today().isoformat()}.pdf"
+                    return (pdf, 200, {
+                        'Content-Type': 'application/pdf',
+                        'Content-Disposition': f'attachment; filename="{filename}"'
+                    })
+                except Exception:
+                    flash('PDF generation via pdfkit failed on the server. Trying alternative...', 'warning')
+            else:
+                app.logger.warning('wkhtmltopdf not found; skipping pdfkit backend.')
         if _WEASY_AVAILABLE:
             try:
                 pdf = WeasyHTML(string=html).write_pdf()
@@ -798,9 +916,19 @@ def create_app():
                     'Content-Disposition': f'attachment; filename="{filename}"'
                 })
             except Exception:
-                flash('PDF generation via WeasyPrint failed on the server. Showing printable view instead.', 'warning')
+                flash('PDF generation via WeasyPrint failed on the server. Trying fallback PDF generation.', 'warning')
+        if _FPDF_AVAILABLE:
+            try:
+                pdf = render_summary_pdf_fpdf(bids)
+                filename = f"summary_{datetime.date.today().isoformat()}.pdf"
+                return (pdf, 200, {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': f'attachment; filename="{filename}"'
+                })
+            except Exception:
+                flash('Fallback PDF generation failed. Showing printable view instead.', 'warning')
 
-        flash('PDF generation is not configured on this server. Install `wkhtmltopdf` and enable `pdfkit` or install `WeasyPrint` for server-side PDFs. Use Print to save as PDF from your browser.', 'warning')
+        flash('PDF generation is not configured on this server. Install `wkhtmltopdf` and enable `pdfkit`, or install system dependencies for `WeasyPrint`. Use Print to save as PDF from your browser.', 'warning')
         return render_template('summary_report.html', bids=bids, filters=request.args, generated_at=datetime.datetime.utcnow())
 
     @app.route('/bid-monitoring')
@@ -815,6 +943,7 @@ def create_app():
         priority_filter = request.args.get('priority', '', type=str).strip()
         system_type_filter = request.args.get('system_type', '', type=str).strip()
         closing_soon_filter = request.args.get('closing_soon', '', type=str).strip()
+        rfq_source_filter = request.args.get('rfq_source', '', type=str).strip()
 
         query = Bid.query
 
@@ -857,6 +986,8 @@ def create_app():
             query = query.filter(Bid.system_type == system_type_filter)
         if canvassing_filter:
             query = query.filter(Bid.canvassing_status == canvassing_filter)
+        if rfq_source_filter:
+            query = query.filter(Bid.rfq_source == rfq_source_filter)
         if closing_soon_filter == 'true':
             today = datetime.date.today()
             next_week = today + datetime.timedelta(days=7)
@@ -896,6 +1027,7 @@ def create_app():
                 'system_type': system_type_filter,
                 'canvassing_status': canvassing_filter,
                 'closing_soon': closing_soon_filter,
+                'rfq_source': rfq_source_filter,
             },
             statuses=statuses,
             regions=regions,
@@ -922,7 +1054,37 @@ if __name__ == '__main__':
         inspector = _inspect(db.engine)
         if 'bids' in inspector.get_table_names():
             columns = [column['name'] for column in inspector.get_columns('bids')]
-            if 'attachments' not in columns:
-                with db.engine.begin() as conn:
-                    conn.execute(text('ALTER TABLE bids ADD COLUMN attachments VARCHAR(2048)'))
+            # Add missing columns for RFQ source and walk-in support
+            missing_columns = {
+                'attachments': "VARCHAR(2048)",
+                'rfq_source': "VARCHAR(20) DEFAULT 'online'",
+                'pr_number': "VARCHAR(255)",
+                'office_department': "VARCHAR(255)",
+                'supplier_name': "VARCHAR(255)",
+                'company_address': "TEXT",
+                'contact_email': "VARCHAR(255)",
+                'contact_phone': "VARCHAR(20)",
+            }
+            with db.engine.begin() as conn:
+                for col_name, col_type in missing_columns.items():
+                    if col_name not in columns:
+                        alter_sql = f'ALTER TABLE bids ADD COLUMN {col_name} {col_type}'
+                        conn.execute(text(alter_sql))
+        
+        # Create bid_attachments table if it doesn't exist
+        if 'bid_attachments' not in inspector.get_table_names():
+            with db.engine.begin() as conn:
+                conn.execute(text('''
+                    CREATE TABLE bid_attachments (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        bid_id INTEGER NOT NULL,
+                        filename VARCHAR(255) NOT NULL,
+                        original_filename VARCHAR(255) NOT NULL,
+                        attachment_type VARCHAR(50),
+                        upload_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        file_size INTEGER,
+                        file_path VARCHAR(1024),
+                        FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE
+                    )
+                '''))
     app.run(host='0.0.0.0', port=5001, debug=True)

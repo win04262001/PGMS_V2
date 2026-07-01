@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  body {
+    background: white;
+    color: #111827;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  nav,
+  footer,
+  .navbar,
+  .navbar-nav,
+  .navbar-brand,
+  .navbar-toggler,
+  .navbar-collapse {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 24px 22px 28px;
+    background: white;
+  }
+
+  .report-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .report-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .report-header-left img {
+    display: none;
+  }
+
+  .report-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  .report-sub {
+    font-size: 13px;
+    color: #475569;
+  }
+
+  .pdf-summary {
+    display: none;
+  }
+
+  .pdf-card-list {
+    display: grid;
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .pdf-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 18px 20px;
+    background: #ffffff;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .pdf-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+
+  .pdf-card-metadata {
+    color: #475569;
+    font-size: 12px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .pdf-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .pdf-card-amount {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 120px;
+  }
+
+  .pdf-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+    gap: 10px 24px;
+  }
+
+  .pdf-card-field {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #475569;
+  }
+
+  .pdf-field-label {
+    min-width: 95px;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .pdf-field-value {
+    color: #111827;
+    word-break: break-word;
+  }
+
+  .empty-state {
+    padding: 48px 22px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    color: #475569;
+    background: #f8fafc;
+    font-size: 15px;
+  }
+</style>
+
+<div class="container">
+  <div class="report-header">
+    <div class="report-header-left">
+      <div class="report-title">Daily Bid Summary</div>
+      <div class="report-sub">Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M') if generated_at else '' }}</div>
+      <div class="report-sub">Total records: {{ bids|length }}</div>
+    </div>
+  </div>
+
+  {% if not bids %}
+  <div class="empty-state">No bids matched the selected filters.</div>
+  {% else %}
+  <div class="pdf-card-list">
+    {% for bid in bids %}
+    <div class="pdf-card">
+      <div class="pdf-card-header">
+        <div>
+          <div class="pdf-card-title">{{ bid.project_title or 'Untitled Bid' }}</div>
+          <div class="pdf-card-metadata">
+            Reference: {{ bid.reference_number or '-' }} | Entity: {{ bid.procuring_entity or '-' }}
+          </div>
+        </div>
+        <div class="pdf-card-amount">ABC: {{ bid.abc_value | format_currency }}</div>
+      </div>
+      <div class="pdf-card-metadata">
+        System: {{ bid.system_type or '-' }} | Category: {{ bid.category or '-' }} | Region: {{ bid.region or '-' }}
+      </div>
+      <div class="pdf-card-grid">
+        <div class="pdf-card-field"><span class="pdf-field-label">Closing</span><span class="pdf-field-value">{{ bid.closing_date | format_date }}{% if bid.closing_time %} {{ bid.closing_time | format_time }}{% endif %}</span></div>
+        <div class="pdf-card-field"><span class="pdf-field-label">Status</span><span class="pdf-field-value">{{ bid.status or '-' }}</span></div>
+        <div class="pdf-card-field"><span class="pdf-field-label">Priority</span><span class="pdf-field-value">{{ bid.priority_level or '-' }}</span></div>
+        <div class="pdf-card-field"><span class="pdf-field-label">Procurement</span><span class="pdf-field-value">{{ bid.procurement_mode or '-' }}</span></div>
+        <div class="pdf-card-field"><span class="pdf-field-label">Location</span><span class="pdf-field-value">{{ bid.delivery_location or '-' }}</span></div>
+        <div class="pdf-card-field"><span class="pdf-field-label">Added</span><span class="pdf-field-value">{{ bid.date_added | format_date if bid.date_added else '-' }}</span></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
